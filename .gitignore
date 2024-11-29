@@ -1,2 +1,2 @@
-.web/bin
-.web/obj
+/web/bin/
+/web/obj/

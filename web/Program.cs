@@ -1,8 +1,11 @@
+using web.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-//builder.Services.AddDbContext<SchoolContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext"))); //ko bo kontekst narjen za to
+builder.Services.AddDbContext<BelezkaContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("BelezkaContext"))); //ko bo kontekst narjen za to
 
 var app = builder.Build();
 
