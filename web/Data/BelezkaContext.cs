@@ -1,8 +1,10 @@
 using web.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace web.Data;
-public class BelezkaContext : DbContext
+public class BelezkaContext : IdentityDbContext<ApplicationUser>
+
 {
     public BelezkaContext(DbContextOptions<BelezkaContext> options) : base(options)
     {
@@ -18,6 +20,7 @@ public class BelezkaContext : DbContext
     public DbSet<WatchlistAsset> WatchlistAssets { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Asset>().ToTable("Asset");
         modelBuilder.Entity<Nastavitve>().ToTable("Nastavitve");
         modelBuilder.Entity<Portfolio>().ToTable("Portfolio");
