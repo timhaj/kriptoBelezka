@@ -2,7 +2,30 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div>
+    <h1 style="text-align: center; font-family: 'Arial', sans-serif; color: #4CAF50; margin-bottom: 20px;">
+        🌟 Dobrodošli na vaš kripto pregledovalnik 🌟 
+    </h1>
+    <table data-show-multi-sort class="table table-striped striped-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name : Symbol</th>
+                <th>Price (USD)</th>
+                <th>Supply</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var crypto in Model)
+            {
+                <tr>
+                    <td>@crypto.Rank</td>
+                    <td>@crypto.Name (@crypto.Symbol)</td>
+                    <td>@string.Format("{0:C2}", decimal.Parse(crypto.PriceUsd))</td>
+                    <td>@string.Format("{0:N0}", decimal.Parse(crypto.Supply))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

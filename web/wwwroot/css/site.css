@@ -29,3 +29,32 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+
+.striped-table {
+  width: 80%; /* Nastavi širino tabele (po želji prilagodi) */
+  margin: 0 auto; /* Ciliranje tabele na sredino */
+  border-collapse: collapse;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+}
+
+.striped-table th, .striped-table td {
+  padding: 10px;
+  border: 1px solid #534040;
+  text-align: left;
+  text-align: center;
+}
+
+.striped-table tbody tr:nth-child(odd) {
+  background-color: #fb0b0b; /* Barva za lihe vrstice (rdeča) */
+}
+
+.striped-table tbody tr:nth-child(even) {
+  background-color: #2a985e; /* Barva za sode vrstice (zelena) */
+}
+
+.striped-table th {
+  background-color: #4CAF50;
+  color: white;
+}

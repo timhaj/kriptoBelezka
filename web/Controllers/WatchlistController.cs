@@ -29,8 +29,24 @@ namespace web.Controllers
         // GET: Watchlist
         public async Task<IActionResult> Index()
         {
-            var belezkaContext = _context.Watchlists.Include(w => w.User);
+            
+            var currentUser = await _usermanager.GetUserAsync(User);
+            var watchlist = await _context.Watchlists.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
+            if (watchlist == null)
+            {
+                watchlist = new Watchlist{ OwnerId = currentUser};
+
+                _context.Watchlists.Add(watchlist);
+                await _context.SaveChangesAsync();
+            }
+            /*
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", watchlist.UserId);
+            return View(watchlist);
+            */
+            
+            var belezkaContext = _context.Watchlists.Include(w => w.OwnerId);
             return View(await belezkaContext.ToListAsync());
+            
         }
 
         // GET: Watchlist/Details/5
@@ -79,15 +95,20 @@ namespace web.Controllers
         // GET: Watchlist/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            /*
             if (id == null)
             {
                 return NotFound();
             }
-
-            var watchlist = await _context.Watchlists.FindAsync(id);
+            */
+            var currentUser = await _usermanager.GetUserAsync(User);
+            var watchlist = await _context.Watchlists.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
             if (watchlist == null)
             {
-                return NotFound();
+                watchlist = new Watchlist{ OwnerId = currentUser};
+
+                _context.Watchlists.Add(watchlist);
+                await _context.SaveChangesAsync();
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", watchlist.UserId);
             return View(watchlist);
