@@ -12,4 +12,5 @@ public class Nastavitve
 
     // Navigation property
     public User? User { get; set; }
+    public ApplicationUser? OwnerId { get; set; }
 }

@@ -11,5 +11,6 @@ public class Watchlist
 
     // Navigation properties
     public User? User { get; set; }
+    public ApplicationUser? OwnerId { get; set; }
     public ICollection<WatchlistAsset>? WatchlistAssets { get; set; } // Many-to-Many
 }

@@ -12,8 +12,8 @@ using web.Data;
 namespace web.Migrations
 {
     [DbContext(typeof(BelezkaContext))]
-    [Migration("20241129135605_ApplicationUser")]
-    partial class ApplicationUser
+    [Migration("20241130103037_Start")]
+    partial class Start
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,10 +105,12 @@ namespace web.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -145,10 +147,12 @@ namespace web.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -279,10 +283,15 @@ namespace web.Migrations
                     b.Property<bool>("IsDarkMode")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OwnerIdId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerIdId");
 
                     b.HasIndex("UserId")
                         .IsUnique()
@@ -299,10 +308,15 @@ namespace web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("OwnerIdId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerIdId");
 
                     b.HasIndex("UserId");
 
@@ -400,10 +414,15 @@ namespace web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("OwnerIdId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerIdId");
 
                     b.HasIndex("UserId")
                         .IsUnique()
@@ -488,18 +507,30 @@ namespace web.Migrations
 
             modelBuilder.Entity("web.Models.Nastavitve", b =>
                 {
+                    b.HasOne("web.Models.ApplicationUser", "OwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerIdId");
+
                     b.HasOne("web.Models.User", "User")
                         .WithOne("Settings")
                         .HasForeignKey("web.Models.Nastavitve", "UserId");
+
+                    b.Navigation("OwnerId");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("web.Models.Portfolio", b =>
                 {
+                    b.HasOne("web.Models.ApplicationUser", "OwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerIdId");
+
                     b.HasOne("web.Models.User", "User")
                         .WithMany("Portfolios")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("OwnerId");
 
                     b.Navigation("User");
                 });
@@ -530,9 +561,15 @@ namespace web.Migrations
 
             modelBuilder.Entity("web.Models.Watchlist", b =>
                 {
+                    b.HasOne("web.Models.ApplicationUser", "OwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerIdId");
+
                     b.HasOne("web.Models.User", "User")
                         .WithOne("Watchlist")
                         .HasForeignKey("web.Models.Watchlist", "UserId");
+
+                    b.Navigation("OwnerId");
 
                     b.Navigation("User");
                 });

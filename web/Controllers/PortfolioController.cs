@@ -16,10 +16,12 @@ namespace web.Controllers
     public class PortfolioController : Controller
     {
         private readonly BelezkaContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
 
-        public PortfolioController(BelezkaContext context)
+        public PortfolioController(BelezkaContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _usermanager = userManager;
         }
 
         // GET: Portfolio

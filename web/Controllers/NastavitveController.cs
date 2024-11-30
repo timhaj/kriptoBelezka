@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace web.Controllers
 {
+    [Authorize]
     public class NastavitveController : Controller
     {
         private readonly BelezkaContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
 
-        public NastavitveController(BelezkaContext context)
+        public NastavitveController(BelezkaContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _usermanager = userManager;
         }
 
         // GET: Nastavitve
@@ -59,8 +64,12 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,IsDarkMode,CurrentCurrencySelected")] Nastavitve nastavitve)
         {
+
+            var currentUser = await _usermanager.GetUserAsync(User);
+
             if (ModelState.IsValid)
             {
+                nastavitve.OwnerId = currentUser;
                 _context.Add(nastavitve);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -72,15 +81,23 @@ namespace web.Controllers
         // GET: Nastavitve/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nastavitve = await _context.Nastavitves.FindAsync(id);
+            /*             if (id == null) //uporabnik mora biti ze prijavljen, zato bo vedno imel Nastavitve/Edit (ker je [Authorize] zgoraj)
+                        {
+                            return NotFound();
+                        } */
+            var currentUser = await _usermanager.GetUserAsync(User);
+            var nastavitve = await _context.Nastavitves.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
             if (nastavitve == null)
             {
-                return NotFound();
+                nastavitve = new Nastavitve
+                {
+                    OwnerId = currentUser, // Assign the current user's ID
+                    IsDarkMode = false,       // Default value
+                    CurrentCurrencySelected = "USD" // Default value
+                };
+
+                _context.Nastavitves.Add(nastavitve);
+                await _context.SaveChangesAsync();
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             return View(nastavitve);
@@ -116,7 +133,7 @@ namespace web.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Edit));
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             return View(nastavitve);

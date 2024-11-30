@@ -18,10 +18,12 @@ namespace web.Controllers
     public class WatchlistController : Controller
     {
         private readonly BelezkaContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
 
-        public WatchlistController(BelezkaContext context)
+        public WatchlistController(BelezkaContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _usermanager = userManager;
         }
 
         // GET: Watchlist

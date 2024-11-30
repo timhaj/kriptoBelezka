@@ -10,6 +10,7 @@ public class Portfolio
 
     // Navigation properties
     public User? User { get; set; } // One-to-Many with User
+    public ApplicationUser? OwnerId { get; set; }
     public ICollection<Transakcija>? Transactions { get; set; } // One-to-Many with Transactions
     public ICollection<PortfolioPerformance>? Performances { get; set; } // One-to-Many with PortfolioPerformance
 }
