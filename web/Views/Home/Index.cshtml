@@ -21,9 +21,35 @@
             {
                 <tr>
                     <td>@crypto.Rank</td>
-                    <td>@crypto.Name (@crypto.Symbol)</td>
-                    <td>@string.Format("{0:C2}", decimal.Parse(crypto.PriceUsd))</td>
-                    <td>@string.Format("{0:N0}", decimal.Parse(crypto.Supply))</td>
+                    <td>@crypto.Symbol (@crypto.Name)</td>
+                    <td>$@{ //dolar se spremeni po potrebi iz nastavitev
+                            //popravi vejice na 1000ice
+                            string priceUsd = crypto.PriceUsd;
+                            string formattedPrice = "Invalid Price";
+
+                            if (!string.IsNullOrWhiteSpace(priceUsd) && priceUsd.Contains("."))
+                            {
+                                int dotIndex = priceUsd.IndexOf(".");
+                                formattedPrice = priceUsd.Substring(0, dotIndex + 3); // Include up to 2 decimals
+                            }
+
+                             @formattedPrice
+                        }
+                    </td>
+                    <td>
+                        @{
+                            string supply = crypto.Supply;
+                            string formattedSupply = "Invalid Supply";
+
+                            if (!string.IsNullOrWhiteSpace(supply) && supply.Contains("."))
+                            {
+                                int dotIndex = supply.IndexOf(".");
+                                formattedSupply = supply.Substring(0, dotIndex); // po potrebi
+                            }
+
+                            @formattedSupply
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
