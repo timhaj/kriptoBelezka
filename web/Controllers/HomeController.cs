@@ -18,8 +18,8 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        
-        string apiUrl = "https://api.coincap.io/v2/assets?limit=20";
+
+        string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
 
         using (HttpClient client = new HttpClient())
         {
@@ -29,7 +29,7 @@ public class HomeController : Controller
             // Pass the data to the view
             return View(apiResult.Data);
         }
-        
+
         return View();
     }
 
@@ -46,6 +46,10 @@ public class HomeController : Controller
         public string Name { get; set; }
         public string PriceUsd { get; set; }
         public string Supply { get; set; }
+        public string MaxSupply { get; set; }
+        public string MarketCapUsd { get; set; }
+        public string VolumeUsd24Hr { get; set; }
+        public string ChangePercent24Hr { get; set; }
     }
 
 

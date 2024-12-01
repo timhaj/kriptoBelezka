@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -19,42 +23,43 @@ html {
 
 body {
   margin-bottom: 60px;
+  font-family: monospace;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
   text-align: start;
 }
 
 
 .striped-table {
-  width: 80%; /* Nastavi širino tabele (po želji prilagodi) */
-  margin: 0 auto; /* Ciliranje tabele na sredino */
+  margin: 0 auto;
   border-collapse: collapse;
-  font-family: 'Arial', sans-serif;
   font-size: 14px;
 }
 
-.striped-table th, .striped-table td {
+.striped-table th,
+.striped-table td {
   padding: 10px;
-  border: 1px solid #534040;
   text-align: left;
   text-align: center;
 }
 
-.striped-table tbody tr:nth-child(odd) {
-  background-color: #fb0b0b; /* Barva za lihe vrstice (rdeča) */
-}
-
-.striped-table tbody tr:nth-child(even) {
-  background-color: #2a985e; /* Barva za sode vrstice (zelena) */
-}
-
 .striped-table th {
-  background-color: #4CAF50;
+  background-color: #2e5eaa;
   color: white;
+}
+
+td{
+  font-family: monospace;
+}
+
+td > span {
+  opacity: 0.75;
 }

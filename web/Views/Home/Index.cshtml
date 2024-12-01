@@ -3,26 +3,31 @@
 }
 
 
-<div>
-    <h1 style="text-align: center; font-family: 'Arial', sans-serif; color: #4CAF50; margin-bottom: 20px;">
-        🌟 Dobrodošli na vaš kripto pregledovalnik 🌟 
-    </h1>
-    <table data-show-multi-sort class="table table-striped striped-table">
+<div class="table-container">
+    <h2 style="text-align: center; font-family: monospace; color: #5b4e77; margin-bottom: 20px;">
+        🚀 Današnje stanje na trgu kriptovalut 🚀
+    </h2>
+    <table data-show-multi-sort class="table table-striped striped-table table-hover align-middle">
         <thead>
             <tr>
                 <th>Rank</th>
-                <th>Name : Symbol</th>
+                <th>Name</th>
                 <th>Price (USD)</th>
                 <th>Supply</th>
+                <th>Max Supply</th>
+                <th>Market Cap (USD)</th>
+                <th>24Hr Volume (USD)</th>
+                <th>Change 24Hr (%)</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider">
             @foreach (var crypto in Model)
             {
                 <tr>
                     <td>@crypto.Rank</td>
-                    <td>@crypto.Symbol (@crypto.Name)</td>
-                    <td>$@{ //dolar se spremeni po potrebi iz nastavitev
+                    <td><strong>@crypto.Name</strong> <span>(@crypto.Symbol)</span></td>
+                    <td>$@{
+                            //dolar se spremeni po potrebi iz nastavitev
                             //popravi vejice na 1000ice
                             string priceUsd = crypto.PriceUsd;
                             string formattedPrice = "Invalid Price";
@@ -33,7 +38,7 @@
                                 formattedPrice = priceUsd.Substring(0, dotIndex + 3); // Include up to 2 decimals
                             }
 
-                             @formattedPrice
+                            @formattedPrice
                         }
                     </td>
                     <td>
@@ -48,6 +53,58 @@
                             }
 
                             @formattedSupply
+                        }
+                    </td>
+                    <td>@{
+                            string MaxSupply = crypto.MaxSupply;
+                            string formattedMaxSupply = "N/A";
+
+                            if (!string.IsNullOrWhiteSpace(MaxSupply) && MaxSupply.Contains("."))
+                            {
+                                int dotIndex = MaxSupply.IndexOf(".");
+                                formattedMaxSupply = MaxSupply.Substring(0, dotIndex);
+                            }
+
+                            @formattedMaxSupply
+                        }
+                    </td>
+                    <td>$@{
+                            string marketCapUsd = crypto.MarketCapUsd;
+                            string formattedMarketCapUsd = "N/A";
+
+                            if (!string.IsNullOrWhiteSpace(marketCapUsd) && marketCapUsd.Contains("."))
+                            {
+                                int dotIndex = marketCapUsd.IndexOf(".");
+                                formattedMarketCapUsd = marketCapUsd.Substring(0, dotIndex);
+                            }
+
+                            @formattedMarketCapUsd
+                        }
+                    </td>
+                    <td>$@{
+                            string volumeUsd24Hr = crypto.VolumeUsd24Hr;
+                            string formattedvolumeUsd24Hr = "N/A";
+
+                            if (!string.IsNullOrWhiteSpace(volumeUsd24Hr) && volumeUsd24Hr.Contains("."))
+                            {
+                                int dotIndex = volumeUsd24Hr.IndexOf(".");
+                                formattedvolumeUsd24Hr = volumeUsd24Hr.Substring(0, dotIndex);
+                            }
+
+                            @formattedvolumeUsd24Hr
+                        }
+                    </td>
+                    <td>@{
+                            string changePercent24Hr = crypto.ChangePercent24Hr;
+                            string formattedchangePercent24Hr = "N/A";
+
+                            if (!string.IsNullOrWhiteSpace(changePercent24Hr) && changePercent24Hr.Contains("."))
+                            {
+                                int dotIndex = changePercent24Hr.IndexOf(".");
+                                formattedchangePercent24Hr = changePercent24Hr.Substring(0, dotIndex + 3);
+                            }
+
+                            @formattedchangePercent24Hr
                         }
                     </td>
                 </tr>
