@@ -56,10 +56,18 @@ body {
   color: white;
 }
 
-td{
+td {
   font-family: monospace;
 }
 
-td > span {
+td>span {
   opacity: 0.75;
+}
+
+.up {
+  color: #98d831 !important;
+}
+
+.down {
+  color: #f03a47 !important;
 }

@@ -20,7 +20,7 @@
                 <th>Change 24Hr (%)</th>
             </tr>
         </thead>
-        <tbody class="table-group-divider">
+        <tbody>
             @foreach (var crypto in Model)
             {
                 <tr>
@@ -41,7 +41,7 @@
                             @formattedPrice
                         }
                     </td>
-                    <td>
+                    <td class="supply">
                         @{
                             string supply = crypto.Supply;
                             string formattedSupply = "Invalid Supply";
@@ -55,7 +55,7 @@
                             @formattedSupply
                         }
                     </td>
-                    <td>@{
+                    <td class="msupply">@{
                             string MaxSupply = crypto.MaxSupply;
                             string formattedMaxSupply = "N/A";
 
@@ -68,7 +68,7 @@
                             @formattedMaxSupply
                         }
                     </td>
-                    <td>$@{
+                    <td class="mcap">@{
                             string marketCapUsd = crypto.MarketCapUsd;
                             string formattedMarketCapUsd = "N/A";
 
@@ -81,7 +81,7 @@
                             @formattedMarketCapUsd
                         }
                     </td>
-                    <td>$@{
+                    <td class="volume">@{
                             string volumeUsd24Hr = crypto.VolumeUsd24Hr;
                             string formattedvolumeUsd24Hr = "N/A";
 
@@ -94,7 +94,7 @@
                             @formattedvolumeUsd24Hr
                         }
                     </td>
-                    <td>@{
+                    <td class="change">@{
                             string changePercent24Hr = crypto.ChangePercent24Hr;
                             string formattedchangePercent24Hr = "N/A";
 
