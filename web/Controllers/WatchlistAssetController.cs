@@ -61,15 +61,26 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,WatchlistId,AssetId")] WatchlistAsset watchlistAsset)
         {
+            Console.WriteLine(watchlistAsset.WatchlistId);
+
             if (ModelState.IsValid)
             {
                 _context.Add(watchlistAsset);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
             }
-            ViewData["AssetId"] = new SelectList(_context.Assets, "Id", "Id", watchlistAsset.AssetId);
-            ViewData["WatchlistId"] = new SelectList(_context.Watchlists, "Id", "Id", watchlistAsset.WatchlistId);
-            return View(watchlistAsset);
+            //ViewData["AssetId"] = new SelectList(_context.Assets, "Id", "Id", watchlistAsset.AssetId);
+            //ViewData["WatchlistId"] = new SelectList(_context.Watchlists, "Id", "Id", watchlistAsset.WatchlistId);
+            var previousUrl = Request.Headers["Referer"].ToString();
+
+            if (string.IsNullOrEmpty(previousUrl))
+            {
+                // Če ni prejšnje strani, preusmerimo na privzeti URL
+                return RedirectToAction("Details", "Home");
+            }
+
+            // Če imamo prejšnjo stran, uporabimo redirect
+            return Redirect(previousUrl);
         }
 
         // GET: WatchlistAsset/Edit/5

@@ -19,8 +19,9 @@
         
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OwnerId.Email)
+            <td class="email_prikaz">
+                
+                @Html.DisplayFor(modelItem => item.OwnerId.Email);
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
@@ -29,3 +30,13 @@
 }
     </tbody>
 </table>
+
+<script>
+    
+    let td_list = document.getElementsByClassName("email_prikaz");
+        console.log(td_list)
+    for (let index = 0; index < td_list.length; index++) {
+        td_list[index].innerHTML =  td_list[index].innerHTML.substring(0,td_list[index].innerHTML.indexOf( String.fromCharCode(64) ));
+    }
+
+</script>

@@ -4,17 +4,21 @@ using web.Models;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
+using web.Data;
+
 
 namespace web.Controllers;
 
 public class HomeController : Controller
 {
+    private readonly BelezkaContext _context;
     private readonly ILogger<HomeController> _logger;
 
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
     }
+
 
     public async Task<IActionResult> Index()
     {
@@ -37,7 +41,7 @@ public class HomeController : Controller
     public class ApiResponse
     {
         public List<CryptoData> Data { get; set; }
-    }
+    }   
 
     public class CryptoData
     {
