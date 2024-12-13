@@ -10,7 +10,7 @@ using web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-
+using EFCore.BulkExtensions;
 
 namespace web.Controllers
 {
@@ -41,36 +41,46 @@ namespace web.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            
+
             string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
 
             using (HttpClient client = new HttpClient())
             {
-
-                _context.Database.ExecuteSqlRawAsync("DELETE FROM Asset");
-    
-
                 var response = await client.GetStringAsync(apiUrl);
                 var apiResult = JsonConvert.DeserializeObject<ApiResponse>(response);
 
-                
-                var assets = apiResult.Data.Select(asset => new Asset
+                var newAssets = apiResult.Data.Select(asset => new Asset
                 {
                     Name = asset.Name,
                     Price = Convert.ToDecimal(asset.PriceUsd),
                     MarketCap = Convert.ToDecimal(asset.MarketCapUsd),
                     CurrentSupply = Convert.ToDecimal(asset.Supply),
                     MaxSupply = Convert.ToDecimal(asset.MaxSupply),
-                    ChangePercent24Hr = (float) Convert.ToDecimal(asset.ChangePercent24Hr)
+                    ChangePercent24Hr = (float)Convert.ToDecimal(asset.ChangePercent24Hr)
                 }).ToList();
 
-                // Dodaj vse zapise naenkrat (brez ponovnih klicev SaveChangesAsync)
-                _context.AddRange(assets.Take(2000));  
+                // Loči nove in obstoječe zapise
+                var existingAssets = _context.Assets.AsNoTracking().ToList();
+                var assetsToUpdate = existingAssets.Where(e => newAssets.Any(n => n.Name == e.Name)).ToList();
+                var assetsToAdd = newAssets.Where(n => !existingAssets.Any(e => e.Name == n.Name)).ToList();
 
-                // En klic SaveChangesAsync za vse spremembe
-                await _context.SaveChangesAsync();
-                
+                // Posodobi obstoječe zapise
+                foreach (var existing in assetsToUpdate)
+                {
+                    var updated = newAssets.First(n => n.Name == existing.Name);
+                    existing.Price = updated.Price;
+                    existing.MarketCap = updated.MarketCap;
+                    existing.CurrentSupply = updated.CurrentSupply;
+                    existing.MaxSupply = updated.MaxSupply;
+                    existing.ChangePercent24Hr = updated.ChangePercent24Hr;
+                }
+
+                // Shrani vse spremembe
+                await _context.BulkUpdateAsync(assetsToUpdate);
+                await _context.BulkInsertAsync(assetsToAdd);
             }
-            
+
             var belezkaContext = _context.Watchlists.Include(w => w.OwnerId);
             return View(await belezkaContext.ToListAsync());
             
