@@ -43,7 +43,14 @@
             @foreach (var savedItem in Model.Saved)
             {
                 <tr>
-                    <td>@savedItem.AssetId</td>
+                    <td>@savedItem.Id</td>
+                    <td>@savedItem.Name</td>
+                    <td>@savedItem.Price</td>
+                    <td>@savedItem.MarketCap</td>
+                    <td>@savedItem.CurrentSupply</td>
+                    <td>@savedItem.MaxSupply</td>
+                    <td>@savedItem.ChangePercent24Hr</td>
+                    
                 </tr>
             }
         </tbody>

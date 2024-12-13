@@ -108,7 +108,7 @@ namespace web.Controllers
     {
     public Watchlist Watchlist { get; set; }
     public List<Asset> Assets { get; set; }
-    public List<WatchlistAsset> Saved { get; set; }
+    public List<Asset> Saved { get; set; }
     }
 
         // GET: Watchlist/Details/5
@@ -131,9 +131,10 @@ namespace web.Controllers
              // Preberi vse "Assets" iz baze
             var assets = await _context.Assets.ToListAsync();
             var saved = await _context.WatchlistAssets
-                .Include(w => w.Asset)  // Če želite naložiti povezano entiteto Asset, ne pa samo AssetId
-                .Where(m => m.WatchlistId == id)  // Filtriraj z uporabo WatchlistId
-                .ToListAsync();
+            .Where(wa => wa.WatchlistId == id) // Filtriraj po WatchlistId
+            .Include(wa => wa.Asset)           // Vključi povezano Asset entiteto
+            .Select(wa => wa.Asset)            // Izberi samo Asset objekte
+            .ToListAsync();
 
             // Ustvari ViewModel in dodeli podatke
             var viewModel = new WatchlistDetailsViewModel

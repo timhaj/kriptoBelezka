@@ -62,6 +62,17 @@ namespace web.Controllers
         public async Task<IActionResult> Create([Bind("Id,WatchlistId,AssetId")] WatchlistAsset watchlistAsset)
         {
             Console.WriteLine(watchlistAsset.WatchlistId);
+            
+             // Preveri, če je zapis že v bazi
+            bool alreadyExists = await _context.WatchlistAssets
+                .AnyAsync(w => w.WatchlistId == watchlistAsset.WatchlistId && w.AssetId == watchlistAsset.AssetId);
+
+            if (alreadyExists)//nic ne naredimo
+            {
+                TempData["ErrorMessage"] = "Asset is already in the watchlist.";
+                return RedirectToAction("Details", "Watchlist", new { id = watchlistAsset.WatchlistId });
+            }
+
 
             if (ModelState.IsValid)
             {
