@@ -10,51 +10,54 @@
 <div>
     <h4>Watchlist</h4>
     <hr />
-    
-<input type="text" id="searchInput" placeholder="Išči kripto žetone..." onkeyup="filterOptions()">
-<form asp-action="Create" asp-controller="WatchlistAsset" method="post">
-        <select id="cryptoSelect" name="AssetId" required>
-            <option value="">Izberi kripto žeton</option>
-            @foreach (var asset in Model.Assets)
-            {
-                <option value="@asset.Id">@asset.Name</option>
-            }
-        </select>
+    <form asp-action="Create" asp-controller="WatchlistAsset" method="post">
+        <div class="dropdown">
+            <div>
+                <input type="text" class="search-bar" id="searchInput" placeholder="Išči kripto žetone..."
+                    onkeyup="filterOptions()">
 
-        <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
-        
-        <button type="submit">ADD</button>
+                <div class="options-list" id="cryptoSelect" name="AssetId" required>
+                    @foreach (var asset in Model.Assets)
+                    {
+                        <div class="option" value="@asset.Id">@asset.Name</div>
+                    }
+                </div>
+            </div>
+            <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
+            <input type="hidden" name="AssetId" value="" />
+            <button id="watchlist-asset-adder" type="submit">Add asset</button>
     </form>
+</div>
 </div>
 
 <table class="table table-bordered">
-        <thead>
+    <thead>
+        <tr>
+            <th>AssetId</th>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Market Cap</th>
+            <th>Current Supply</th>
+            <th>Max Supply</th>
+            <th>Change (24hr)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var savedItem in Model.Saved)
+        {
             <tr>
-                <th>AssetId</th>
-                <th>Symbol</th>
-                <th>Price</th>
-                <th>Market Cap</th>
-                <th>Current Supply</th>
-                <th>Max Supply</th>
-                <th>Change (24hr)</th>
+                <td>@savedItem.Id</td>
+                <td>@savedItem.Name</td>
+                <td>@savedItem.Price</td>
+                <td>@savedItem.MarketCap</td>
+                <td>@savedItem.CurrentSupply</td>
+                <td>@savedItem.MaxSupply</td>
+                <td>@savedItem.ChangePercent24Hr</td>
+
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var savedItem in Model.Saved)
-            {
-                <tr>
-                    <td>@savedItem.Id</td>
-                    <td>@savedItem.Name</td>
-                    <td>@savedItem.Price</td>
-                    <td>@savedItem.MarketCap</td>
-                    <td>@savedItem.CurrentSupply</td>
-                    <td>@savedItem.MaxSupply</td>
-                    <td>@savedItem.ChangePercent24Hr</td>
-                    
-                </tr>
-            }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>
 </div>
 
 <div>
@@ -63,41 +66,83 @@
 
 
 
-
-
-
-
-
 <script>
-const cryptoData = [];
- function populateSelect() {
-            const select = document.getElementById("cryptoSelect");
-            cryptoData.forEach(crypto => {
-                const option = document.createElement("option");
-                option.value = crypto.symbol;
-                option.textContent = `${crypto.name} (${crypto.symbol})`;
-                select.appendChild(option);
-            });
+    function filterOptions() {
+
+    }
+    const searchBar = document.querySelector('.search-bar');
+    const optionsList = document.querySelector('.options-list');
+    const options = document.querySelectorAll('.option');
+    // Show options when the search bar is focused
+    searchBar.addEventListener('focus', () => {
+        optionsList.classList.add('active');
+    });
+
+    // Hide options when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown')) {
+            optionsList.classList.remove('active');
         }
+    });
 
-function filterOptions() {
-            const input = document.getElementById("searchInput").value.toLowerCase();
-            const select = document.getElementById("cryptoSelect");
-            const options = select.getElementsByTagName("option");
+    // Filter options based on the search input
+    searchBar.addEventListener('input', () => {
+        const searchTerm = searchBar.value.toLowerCase();
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        });
+    });
 
-            // Skrij vse možnosti, ki ne ustrezajo iskanju
-            for (let i = 1; i < options.length; i++) {
-                const option = options[i];
-                const text = option.textContent.toLowerCase();
+    // Handle option click
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            searchBar.value = option.textContent;
+            const hiddenInput = document.querySelector('input[name="AssetId"]');
+            hiddenInput.value = option.getAttribute('value');
+            optionsList.classList.remove('active');
+        });
+    });
 
-                if (text.includes(input)) {
-                    option.style.display = "block";  // Pokaži možnost
-                } else {
-                    option.style.display = "none";  // Skrij možnost
-                }
+    @*     const cryptoData = [];
+    function populateSelect() {
+        const select = document.getElementById("cryptoSelect");
+        cryptoData.forEach(crypto => {
+            const option = document.createElement("option");
+            option.value = crypto.symbol;
+            option.textContent = `${crypto.name} (${crypto.symbol})`;
+            select.appendChild(option);
+        });
+    }
+
+    function filterOptions() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const select = document.getElementById("cryptoSelect");
+        const options = select.getElementsByTagName("option");
+
+        // Skrij vse možnosti, ki ne ustrezajo iskanju
+        for (let i = 1; i < options.length; i++) {
+            const option = options[i];
+            const text = option.textContent.toLowerCase();
+
+            if (text.includes(input)) {
+                option.style.display = "block";  // Pokaži možnost
+            } else {
+                option.style.display = "none";  // Skrij možnost
             }
         }
+    }
 
-populateSelect();
-
+    populateSelect(); *@
 </script>
+
+
+@* 
+<script>
+
+
+</script> *@

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using EFCore.BulkExtensions;
+using System.Globalization;
 
 namespace web.Controllers
 {
@@ -30,18 +31,16 @@ namespace web.Controllers
         // GET: Watchlist
         public async Task<IActionResult> Index()
         {
-            
+
             var currentUser = await _usermanager.GetUserAsync(User);
             var watchlist = await _context.Watchlists.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
             if (watchlist == null)
             {
-                watchlist = new Watchlist{ OwnerId = currentUser};
+                watchlist = new Watchlist { OwnerId = currentUser };
 
                 _context.Watchlists.Add(watchlist);
                 await _context.SaveChangesAsync();
             }
-
-            
 
             string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
 
@@ -53,11 +52,11 @@ namespace web.Controllers
                 var newAssets = apiResult.Data.Select(asset => new Asset
                 {
                     Name = asset.Name,
-                    Price = Convert.ToDecimal(asset.PriceUsd),
-                    MarketCap = Convert.ToDecimal(asset.MarketCapUsd),
-                    CurrentSupply = Convert.ToDecimal(asset.Supply),
-                    MaxSupply = Convert.ToDecimal(asset.MaxSupply),
-                    ChangePercent24Hr = (float)Convert.ToDecimal(asset.ChangePercent24Hr)
+                    Price = ParseDecimal(asset.PriceUsd, 0), // Default to 0 if parsing fails
+                    MarketCap = ParseDecimal(asset.MarketCapUsd, 0),
+                    CurrentSupply = ParseDecimal(asset.Supply, 0),
+                    MaxSupply = ParseDecimal(asset.MaxSupply, 0),
+                    ChangePercent24Hr = (float)ParseDecimal(asset.ChangePercent24Hr, 0)
                 }).ToList();
 
                 // Loči nove in obstoječe zapise
@@ -83,33 +82,40 @@ namespace web.Controllers
 
             var belezkaContext = _context.Watchlists.Include(w => w.OwnerId);
             return View(await belezkaContext.ToListAsync());
-            
+
+        }
+
+        decimal ParseDecimal(string input, decimal defaultValue)
+        {
+            return decimal.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
+                ? result
+                : defaultValue;
         }
 
         public class ApiResponse
-    {
-        public List<CryptoData> Data { get; set; }
-    }   
+        {
+            public List<CryptoData> Data { get; set; }
+        }
 
-    public class CryptoData
-    {
-        public string Rank { get; set; }
-        public string Symbol { get; set; }
-        public string Name { get; set; }
-        public string PriceUsd { get; set; }
-        public string Supply { get; set; }
-        public string MaxSupply { get; set; }
-        public string MarketCapUsd { get; set; }
-        public string VolumeUsd24Hr { get; set; }
-        public string ChangePercent24Hr { get; set; }
-    }
+        public class CryptoData
+        {
+            public string Rank { get; set; }
+            public string Symbol { get; set; }
+            public string Name { get; set; }
+            public string PriceUsd { get; set; }
+            public string Supply { get; set; }
+            public string MaxSupply { get; set; }
+            public string MarketCapUsd { get; set; }
+            public string VolumeUsd24Hr { get; set; }
+            public string ChangePercent24Hr { get; set; }
+        }
 
-    public class WatchlistDetailsViewModel
-    {
-    public Watchlist Watchlist { get; set; }
-    public List<Asset> Assets { get; set; }
-    public List<Asset> Saved { get; set; }
-    }
+        public class WatchlistDetailsViewModel
+        {
+            public Watchlist Watchlist { get; set; }
+            public List<Asset> Assets { get; set; }
+            public List<Asset> Saved { get; set; }
+        }
 
         // GET: Watchlist/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -126,16 +132,16 @@ namespace web.Controllers
             {
                 return NotFound();
             }
-            
 
-             // Preberi vse "Assets" iz baze
+
+            // Preberi vse "Assets" iz baze
             var assets = await _context.Assets.ToListAsync();
             var saved = await _context.WatchlistAssets
             .Where(wa => wa.WatchlistId == id) // Filtriraj po WatchlistId
             .Include(wa => wa.Asset)           // Vključi povezano Asset entiteto
             .Select(wa => wa.Asset)            // Izberi samo Asset objekte
+            .OrderBy(a => a.Id)              // Razvrsti po imenu
             .ToListAsync();
-
             // Ustvari ViewModel in dodeli podatke
             var viewModel = new WatchlistDetailsViewModel
             {
@@ -144,7 +150,7 @@ namespace web.Controllers
                 Saved = saved
             };
 
-            viewModel.Assets =  await _context.Assets.ToListAsync(); // Pridobite vse assete iz baze
+            viewModel.Assets = await _context.Assets.ToListAsync(); // Pridobite vse assete iz baze
 
             // Pošlji ViewModel na pogled
             return View(viewModel);
@@ -187,7 +193,7 @@ namespace web.Controllers
             var watchlist = await _context.Watchlists.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
             if (watchlist == null)
             {
-                watchlist = new Watchlist{ OwnerId = currentUser};
+                watchlist = new Watchlist { OwnerId = currentUser };
 
                 _context.Watchlists.Add(watchlist);
                 await _context.SaveChangesAsync();

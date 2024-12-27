@@ -61,9 +61,9 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,WatchlistId,AssetId")] WatchlistAsset watchlistAsset)
         {
-            Console.WriteLine(watchlistAsset.WatchlistId);
-            
-             // Preveri, če je zapis že v bazi
+            Console.WriteLine(watchlistAsset.AssetId);
+
+            // Preveri, če je zapis že v bazi
             bool alreadyExists = await _context.WatchlistAssets
                 .AnyAsync(w => w.WatchlistId == watchlistAsset.WatchlistId && w.AssetId == watchlistAsset.AssetId);
 
