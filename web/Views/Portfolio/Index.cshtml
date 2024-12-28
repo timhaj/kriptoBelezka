@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+@* <h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -32,4 +32,49 @@
         </tr>
 }
     </tbody>
-</table>
+</table> *@
+
+
+<div>
+    @if (!Model.Any())
+    {
+        <p>You have not yet created a portfolio.</p>
+        <form asp-action="Create">
+            <input type="hidden" name="OwnerId" value="@ViewBag.UserId" />
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </form>
+    }
+    else
+    {
+        <div class="portfolio-main">
+            <div>
+                <h2>My portfolio</h2>
+                <p>tuki bo networth</p>
+            </div>
+            <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create" class="portfolio-add-button-link">+ Add transaction</a></button>
+        </div>
+        <hr>
+        <p>Holdings</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Portfolio ID</th>
+                    <th>Owner</th>
+                    <th>Transactions</th>
+                    <th>Performances</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var portfolio in Model)
+                {
+                    <tr>
+                        <td>@portfolio.Id</td>
+                        <td>@portfolio.OwnerId?.UserName ?? "Unknown"</td>
+                        <td>@(portfolio.Transactions?.Count() ?? 0)</td>
+                        <td>@(portfolio.Performances?.Count() ?? 0)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -27,8 +27,12 @@ namespace web.Controllers
         // GET: Portfolio
         public async Task<IActionResult> Index()
         {
-            var belezkaContext = _context.Portfolios.Include(p => p.User);
-            return View(await belezkaContext.ToListAsync());
+            var currentUser = await _usermanager.GetUserAsync(User);
+            var portfolios = await _context.Portfolios
+                .Where(n => n.OwnerId == currentUser)
+                .ToListAsync();
+            ViewBag.UserId = currentUser.Id;
+            return View(portfolios ?? new List<Portfolio>());
         }
 
         // GET: Portfolio/Details/5
@@ -64,12 +68,14 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId")] Portfolio portfolio)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(portfolio);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            // Access the OwnerId from the form
+            var ownerId = Request.Form["OwnerId"].ToString();
+            var currentUser = await _usermanager.GetUserAsync(User);
+            //var owner = await _context.ApplicationUser.FindAsync(ownerId);
+            var portfolios = new Portfolio { OwnerId = currentUser };
+            _context.Portfolios.Add(portfolios);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", portfolio.UserId);
             return View(portfolio);
         }

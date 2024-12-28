@@ -4,22 +4,38 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Transakcija</h4>
+<h1>Add a new transaction</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <input type="hidden" name="PortfolioId" value="@ViewBag.PortId.Id">
+            <input type="hidden" name="AssetId" value="" />
+            @*             <div class="form-group">
                 <label asp-for="PortfolioId" class="control-label"></label>
-                <select asp-for="PortfolioId" class ="form-control" asp-items="ViewBag.PortfolioId"></select>
+                <select asp-for="PortfolioId" class="form-control" asp-items="ViewBag.PortfolioId"></select>
+            </div> *@
+
+            <div class="dropdown">
+                <div class="form-group">
+                    <label asp-for="Asset" class="control-label"></label>
+                    <input type="text" class="search-bar" id="searchInput" placeholder="Išči kripto žetone..."
+                        onkeyup="filterOptions()">
+
+                    <div class="options-list" id="cryptoSelect" name="AssetId" required>
+                        @foreach (var asset in @ViewBag.Assets)
+                        {
+                            <div class="option" value="@asset.Id">@asset.Name</div>
+                        }
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
+
+            @*             <div class="form-group">
                 <label asp-for="AssetId" class="control-label"></label>
-                <select asp-for="AssetId" class ="form-control" asp-items="ViewBag.AssetId"></select>
-            </div>
+                <select asp-for="AssetId" class="form-control" asp-items="ViewBag.AssetId"></select>
+            </div> *@
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
                 <input asp-for="Quantity" class="form-control" />
@@ -35,14 +51,88 @@
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+            <br>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add transaction" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
+<br>
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Portfolio" asp-action="Index">Back to Portfolio</a>
 </div>
 
+<script>
+    function filterOptions() {
+
+    }
+    const searchBar = document.querySelector('.search-bar');
+    const optionsList = document.querySelector('.options-list');
+    const options = document.querySelectorAll('.option');
+    // Show options when the search bar is focused
+    searchBar.addEventListener('focus', () => {
+        optionsList.classList.add('active');
+    });
+
+    // Hide options when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown')) {
+            optionsList.classList.remove('active');
+        }
+    });
+
+    // Filter options based on the search input
+    searchBar.addEventListener('input', () => {
+        const searchTerm = searchBar.value.toLowerCase();
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        });
+    });
+
+    // Handle option click
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            searchBar.value = option.textContent;
+            const hiddenInput = document.querySelector('input[name="AssetId"]');
+            hiddenInput.value = option.getAttribute('value');
+            optionsList.classList.remove('active');
+        });
+    });
+
+    @*     const cryptoData = [];
+    function populateSelect() {
+        const select = document.getElementById("cryptoSelect");
+        cryptoData.forEach(crypto => {
+            const option = document.createElement("option");
+            option.value = crypto.symbol;
+            option.textContent = `${crypto.name} (${crypto.symbol})`;
+            select.appendChild(option);
+        });
+    }
+
+    function filterOptions() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const select = document.getElementById("cryptoSelect");
+        const options = select.getElementsByTagName("option");
+
+        // Skrij vse možnosti, ki ne ustrezajo iskanju
+        for (let i = 1; i < options.length; i++) {
+            const option = options[i];
+            const text = option.textContent.toLowerCase();
+
+            if (text.includes(input)) {
+                option.style.display = "block";  // Pokaži možnost
+            } else {
+                option.style.display = "none";  // Skrij možnost
+            }
+        }
+    }
+
+    populateSelect(); *@
+</script>

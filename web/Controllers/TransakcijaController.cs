@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Formats.Tar;
 
 namespace web.Controllers
 {
     public class TransakcijaController : Controller
     {
         private readonly BelezkaContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
 
-        public TransakcijaController(BelezkaContext context)
+        public TransakcijaController(BelezkaContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _usermanager = userManager;
         }
 
         // GET: Transakcija
@@ -47,8 +52,13 @@ namespace web.Controllers
         }
 
         // GET: Transakcija/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var currentUser = await _usermanager.GetUserAsync(User);
+            var portfolio = await _context.Portfolios.FirstOrDefaultAsync(p => p.OwnerId == currentUser);
+            var assets = await _context.Assets.ToListAsync();
+            ViewBag.Assets = assets;
+            ViewBag.PortId = portfolio;
             ViewData["AssetId"] = new SelectList(_context.Assets, "Id", "Id");
             ViewData["PortfolioId"] = new SelectList(_context.Portfolios, "Id", "Id");
             return View();
@@ -61,14 +71,17 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PortfolioId,AssetId,Quantity,Date,Price")] Transakcija transakcija)
         {
+            Console.WriteLine(Request.Form);
             if (ModelState.IsValid)
             {
                 _context.Add(transakcija);
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Portfolio");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AssetId"] = new SelectList(_context.Assets, "Id", "Id", transakcija.AssetId);
             ViewData["PortfolioId"] = new SelectList(_context.Portfolios, "Id", "Id", transakcija.PortfolioId);
+            return RedirectToAction("Index", "Portfolio");
             return View(transakcija);
         }
 

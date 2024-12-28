@@ -126,3 +126,38 @@ td>span {
   padding: 5px;
   margin-left: 25px;
 }
+
+.portfolio-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.portfolio-add-button {
+  background-color: #258cfb;
+  border-radius: 20px;
+  height: 50px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.portfolio-add-button-link {
+  color: white;
+  font-weight: 700;
+}
+
+.portfolio-add-button-link:link {
+  text-decoration: none;
+}
+
+.portfolio-add-button-link:visited {
+  text-decoration: none;
+}
+
+.portfolio-add-button-link:hover {
+  text-decoration: none;
+}
+
+.portfolio-add-button-link:active {
+  text-decoration: none;
+}
