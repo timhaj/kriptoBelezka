@@ -49,32 +49,99 @@
         <div class="portfolio-main">
             <div>
                 <h2>My portfolio</h2>
-                <p>tuki bo networth</p>
+                <p class="portfolio-networth h1 fw-bold">@ViewBag.PortfolioNetWorth</p>
             </div>
-            <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create" class="portfolio-add-button-link">+ Add transaction</a></button>
+            <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
+                    class="portfolio-add-button-link">+ Add transaction</a></button>
         </div>
         <hr>
-        <p>Holdings</p>
-        <table>
+        <div class="d-flex">
+            <p class="portfolio-holdings-switcher me-5">Holdings</p>
+            <p class="portfolio-transaction-switcher">Transactions</p>
+        </div>
+        <table class="portfolio-transaction-history-tab w-100">
             <thead>
                 <tr>
-                    <th>Portfolio ID</th>
-                    <th>Owner</th>
-                    <th>Transactions</th>
-                    <th>Performances</th>
+                    <th class="pe-5">Date</th>
+                    <th class="pe-5">Asset</th>
+                    <th class="pe-5">Price</th>
+                    <th class="pe-5">Quantity</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var portfolio in Model)
+                @foreach (var t in @ViewBag.transactions)
                 {
                     <tr>
-                        <td>@portfolio.Id</td>
-                        <td>@portfolio.OwnerId?.UserName ?? "Unknown"</td>
-                        <td>@(portfolio.Transactions?.Count() ?? 0)</td>
-                        <td>@(portfolio.Performances?.Count() ?? 0)</td>
+                        <td>@t.Date</td>
+                        <td>@t.Asset.Name</td>
+                        <td>@t.Price</td>
+                        <td>@t.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <table class="portfolio-overview-tab">
+            <thead>
+                <tr>
+                    <th class="pe-5">Asset</th>
+                    <th class="pe-5">Price</th>
+                    <th class="pe-5">Holdings</th>
+                    <th class="pe-5">Average buy price</th>
+                    <th class="pe-5">Profit/Loss (ROI)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in @ViewBag.overview)
+                {
+                    <tr>
+                        <td>@t.AssetName</td>
+                        <td>@t.CurrentAssetPrice</td>
+                        <td>@t.TotalQuantity</td>
+                        <td>@t.AveragePrice</td>
+                        <td>
+                            @if (t.ProfitLoss < 0)
+                            {
+                                <span style="color: red;">@t.ProfitLoss.ToString("P2")</span> <!-- Negative ROI -->
+                            }
+                            else
+                            {
+                                <span style="color: green;">@t.ProfitLoss.ToString("P2")</span> <!-- Positive ROI -->
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     }
 </div>
+
+<script>
+    // Get references to the buttons and tables
+    const holdingsSwitcher = document.querySelector('.portfolio-holdings-switcher');
+    const transactionsSwitcher = document.querySelector('.portfolio-transaction-switcher');
+    const holdingsTable = document.querySelector('.portfolio-overview-tab');
+    const transactionsTable = document.querySelector('.portfolio-transaction-history-tab');
+
+    // Function to show holdings table and hide transactions table
+    holdingsSwitcher.addEventListener('click', () => {
+        holdingsTable.style.display = 'table'; // Show the holdings table
+        transactionsTable.style.display = 'none'; // Hide the transactions table
+
+        // Add active style to the clicked button
+        holdingsSwitcher.classList.add('active');
+        transactionsSwitcher.classList.remove('active');
+    });
+
+    // Function to show transactions table and hide holdings table
+    transactionsSwitcher.addEventListener('click', () => {
+        holdingsTable.style.display = 'none'; // Hide the holdings table
+        transactionsTable.style.display = 'table'; // Show the transactions table
+
+        // Add active style to the clicked button
+        transactionsSwitcher.classList.add('active');
+        holdingsSwitcher.classList.remove('active');
+    });
+
+    // Initialize by hiding one of the tables (optional)
+    transactionsTable.style.display = 'none'; // Hide transactions table by default
+</script>
