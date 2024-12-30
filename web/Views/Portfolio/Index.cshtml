@@ -74,7 +74,7 @@
                     <th class="pe-5">Quantity</th>
                 </tr>
             </thead>
-            <tbody id ="podatki">
+            <tbody id="podatki">
                 @foreach (var t in @ViewBag.transactions)
                 {
                     <tr>
@@ -162,44 +162,44 @@
 
 
 
-// Funkcija za normalizacijo datumov (nastavi čas na 00:00:00)
-function normalizeDate(date) {
-    const normalized = new Date(date);
-    normalized.setHours(0, 0, 0, 0);
-    return normalized;
-}
+    // Funkcija za normalizacijo datumov (nastavi čas na 00:00:00)
+    function normalizeDate(date) {
+        const normalized = new Date(date);
+        normalized.setHours(0, 0, 0, 0);
+        return normalized;
+    }
 
-// Funkcija za izračun vrednosti portfelja
-function calculatePortfolioValue(transactions, startDate) {
-    // Pridobimo dneve od startDate do danes
-    const days = getDaysWithMonthNames(new Date(startDate));
+    // Funkcija za izračun vrednosti portfelja
+    function calculatePortfolioValue(transactions, startDate) {
+        // Pridobimo dneve od startDate do danes
+        const days = getDaysWithMonthNames(new Date(startDate));
 
-    // Pretvorimo transakcije v bolj uporabno obliko (pretvorimo datume)
-    const parsedTransactions = transactions.map(t => ({
-        ...t,
-        Date: normalizeDate(new Date(t.Date))
-    }));
+        // Pretvorimo transakcije v bolj uporabno obliko (pretvorimo datume)
+        const parsedTransactions = transactions.map(t => ({
+            ...t,
+            Date: normalizeDate(new Date(t.Date))
+        }));
 
-    // Objekt za shranjevanje vrednosti portfelja za vsak dan
-    const portfolioValues = {};
+        // Objekt za shranjevanje vrednosti portfelja za vsak dan
+        const portfolioValues = {};
 
-    // Iteriramo skozi dni
-    days.forEach(day => {
-        const currentDate = normalizeDate(new Date(day));
-        // Filtriramo transakcije, ki so bile izvedene pred ali na currentDate
-        const filteredTransactions = parsedTransactions.filter(t => t.Date <= currentDate);
+        // Iteriramo skozi dni
+        days.forEach(day => {
+            const currentDate = normalizeDate(new Date(day));
+            // Filtriramo transakcije, ki so bile izvedene pred ali na currentDate
+            const filteredTransactions = parsedTransactions.filter(t => t.Date <= currentDate);
 
-        // Izračunamo skupno vrednost portfelja za ta dan
-        const totalValue = filteredTransactions.reduce((sum, t) => {
-            return sum + t.Price * t.Quantity; //t.Price se spremeni dinamicno glede na dan
-        }, 0);
+            // Izračunamo skupno vrednost portfelja za ta dan
+            const totalValue = filteredTransactions.reduce((sum, t) => {
+                return sum + t.Price * t.Quantity; //t.Price se spremeni dinamicno glede na dan
+            }, 0);
 
-        // Shranimo vrednost za ta dan
-        portfolioValues[day] = totalValue;
-    });
+            // Shranimo vrednost za ta dan
+            portfolioValues[day] = totalValue;
+        });
 
-    return portfolioValues;
-}
+        return portfolioValues;
+    }
 
     // Inicializiramo seznam objektov
     const podatki = [];
@@ -238,69 +238,62 @@ function calculatePortfolioValue(transactions, startDate) {
             const formattedDate = date.toISOString().split('T')[0]; // Format: yyyy-MM-dd
             daysWithMonthNames.push(`${formattedDate}`);
         }
-
         return daysWithMonthNames;
     }
 
-    var lastDate = '@ViewBag.lastTransaction.Date';
-
-
-   
-    
-
+    var lastDate = '@ViewBag.lastTransaction.Date.ToString("yyyy-MM-ddTHH:mm:ss")';
+    console.log(lastDate);
     // Primer uporabe
     var startDate2 = new Date(lastDate);
+    console.log(startDate2);
     const days = getDaysWithMonthNames(startDate2);
-
+    console.log(days);
+    console.log("baba");
     // Testiranje funkcije
     const portfolio = calculatePortfolioValue(podatki, startDate2);
-    
+
     const portfolioValues = Object.values(portfolio);
 
     const data = {
-    labels: days, // Dnevi v decembru
-    datasets: [{
-      label: 'Cena portfelija',
-      data: portfolioValues, // Cene portfelija za vsak dan
-      borderColor: 'rgb(100, 192, 192)',
-      backgroundColor: 'rgba(100, 192, 192, 0.2)',
-      fill: true,
-      tension: 0.1
-    }]
-  };
+        labels: days, // Dnevi v decembru
+        datasets: [{
+            label: 'Cena portfelija',
+            data: portfolioValues, // Cene portfelija za vsak dan
+            borderColor: 'rgb(100, 192, 192)',
+            backgroundColor: 'rgba(100, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.1
+        }]
+    };
 
-  // Konfiguracija grafa
-  const config = {
-    type: 'line',
-    data: data,
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Cena portfelija skozi december',
-        }
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Dan'
-          }
+    // Konfiguracija grafa
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Dan'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Cena portfelija (€)'
+                    }
+                }
+            }
         },
-        y: {
-          title: {
-            display: true,
-            text: 'Cena portfelija (€)'
-          }
-        }
-      }
-    },
-  };
+    };
 
-  // Inicializirajte graf
-  const ctx = document.getElementById('myChart').getContext('2d');
-  new Chart(ctx, config);
+    // Inicializirajte graf
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, config);
 
 
 
