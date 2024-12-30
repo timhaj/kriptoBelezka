@@ -54,6 +54,12 @@
             <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
                     class="portfolio-add-button-link">+ Add transaction</a></button>
         </div>
+
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
+
+
         <hr>
         <div class="d-flex">
             <p class="portfolio-holdings-switcher me-5">Holdings</p>
@@ -68,7 +74,7 @@
                     <th class="pe-5">Quantity</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id ="podatki">
                 @foreach (var t in @ViewBag.transactions)
                 {
                     <tr>
@@ -114,7 +120,7 @@
         </table>
     }
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Get references to the buttons and tables
     const holdingsSwitcher = document.querySelector('.portfolio-holdings-switcher');
@@ -144,4 +150,159 @@
 
     // Initialize by hiding one of the tables (optional)
     transactionsTable.style.display = 'none'; // Hide transactions table by default
+
+
+    // Pridobimo vse vrstice iz <tbody> z ID-jem data-transactions
+    const rows = document.querySelectorAll("#podatki tr");
+
+
+
+
+
+
+
+
+// Funkcija za normalizacijo datumov (nastavi čas na 00:00:00)
+function normalizeDate(date) {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+}
+
+// Funkcija za izračun vrednosti portfelja
+function calculatePortfolioValue(transactions, startDate) {
+    // Pridobimo dneve od startDate do danes
+    const days = getDaysWithMonthNames(new Date(startDate));
+
+    // Pretvorimo transakcije v bolj uporabno obliko (pretvorimo datume)
+    const parsedTransactions = transactions.map(t => ({
+        ...t,
+        Date: normalizeDate(new Date(t.Date))
+    }));
+
+    // Objekt za shranjevanje vrednosti portfelja za vsak dan
+    const portfolioValues = {};
+
+    // Iteriramo skozi dni
+    days.forEach(day => {
+        const currentDate = normalizeDate(new Date(day));
+        // Filtriramo transakcije, ki so bile izvedene pred ali na currentDate
+        const filteredTransactions = parsedTransactions.filter(t => t.Date <= currentDate);
+
+        // Izračunamo skupno vrednost portfelja za ta dan
+        const totalValue = filteredTransactions.reduce((sum, t) => {
+            return sum + t.Price * t.Quantity; //t.Price se spremeni dinamicno glede na dan
+        }, 0);
+
+        // Shranimo vrednost za ta dan
+        portfolioValues[day] = totalValue;
+    });
+
+    return portfolioValues;
+}
+
+    // Inicializiramo seznam objektov
+    const podatki = [];
+
+    // Iteriramo skozi vrstice in pridobimo podatke
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const obj = {
+            Date: cells[0].textContent.trim(),
+            Name: cells[1].textContent.trim(),
+            Price: parseFloat(cells[2].textContent.trim()),
+            Quantity: parseFloat(cells[3].textContent.trim())
+        };
+        podatki.push(obj);
+    });
+
+    // Prikaz podatkov v konzoli
+    console.log(podatki);
+
+
+    function getDaysWithMonthNames(startDate) {
+        const endDate = new Date(); // Današnji datum
+        const daysWithMonthNames = [];
+
+        // Nastavite začetni datum na začetni datum (ura nastavljena na 00:00:00)
+        startDate.setHours(0, 0, 0, 0);
+
+        // Preverite, ali je začetni datum pred današnjim datumom
+        if (startDate > endDate) {
+            console.error('Začetni datum ne sme biti kasnejši od današnjega datuma.');
+            return [];
+        }
+
+        // Zanka za iteracijo skozi dni
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            const formattedDate = date.toISOString().split('T')[0]; // Format: yyyy-MM-dd
+            daysWithMonthNames.push(`${formattedDate}`);
+        }
+
+        return daysWithMonthNames;
+    }
+
+    var lastDate = '@ViewBag.lastTransaction.Date';
+
+
+   
+    
+
+    // Primer uporabe
+    var startDate2 = new Date(lastDate);
+    const days = getDaysWithMonthNames(startDate2);
+
+    // Testiranje funkcije
+    const portfolio = calculatePortfolioValue(podatki, startDate2);
+    
+    const portfolioValues = Object.values(portfolio);
+
+    const data = {
+    labels: days, // Dnevi v decembru
+    datasets: [{
+      label: 'Cena portfelija',
+      data: portfolioValues, // Cene portfelija za vsak dan
+      borderColor: 'rgb(100, 192, 192)',
+      backgroundColor: 'rgba(100, 192, 192, 0.2)',
+      fill: true,
+      tension: 0.1
+    }]
+  };
+
+  // Konfiguracija grafa
+  const config = {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Cena portfelija skozi december',
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Dan'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Cena portfelija (€)'
+          }
+        }
+      }
+    },
+  };
+
+  // Inicializirajte graf
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, config);
+
+
+
+
 </script>

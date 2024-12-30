@@ -61,6 +61,11 @@ namespace web.Controllers
                     .Select(g => g.Sum(t => (decimal)t.Quantity * (decimal)t.Asset.Price)) // Calculate total value for each asset
                     .Sum(); // Sum up the total values of all assets
                 ViewBag.PortfolioNetWorth = portfolioNetWorth;
+                
+                foreach(var t in saved){//dobimo zadnji transaction
+                    ViewBag.lastTransaction = t;
+                }
+                
             }
 
             //user id
