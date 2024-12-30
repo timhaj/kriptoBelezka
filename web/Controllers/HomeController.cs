@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
 using web.Data;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace web.Controllers;
 
@@ -13,15 +15,33 @@ public class HomeController : Controller
 {
     private readonly BelezkaContext _context;
     private readonly ILogger<HomeController> _logger;
+    private readonly UserManager<ApplicationUser> _usermanager;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, BelezkaContext context)
     {
         _logger = logger;
+        _usermanager = userManager;
+        _context = context;
     }
 
 
     public async Task<IActionResult> Index()
     {
+        var currentUser = await _usermanager.GetUserAsync(User);
+        if (currentUser != null)
+        {
+            var nastavitve = await _context.Nastavitves
+                                        .Where(s => s.OwnerId == currentUser)
+                                        .FirstOrDefaultAsync();
+            if (nastavitve != null && nastavitve.IsDarkMode == true)
+            {
+                ViewBag.mode = "dark";
+            }
+            else
+            {
+                ViewBag.mode = "light";
+            }
+        }
 
         string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
 
@@ -41,7 +61,7 @@ public class HomeController : Controller
     public class ApiResponse
     {
         public List<CryptoData> Data { get; set; }
-    }   
+    }
 
     public class CryptoData
     {

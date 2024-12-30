@@ -33,32 +33,36 @@ namespace web.Controllers
                 .ToListAsync();
             // transaction history
             var portfolioID = await _context.Portfolios.FirstOrDefaultAsync(p => p.OwnerId == currentUser);
-            var saved = await _context.Transakcijas
-            .Where(wa => wa.PortfolioId == portfolioID.Id)
-            .Include(p => p.Asset)
-            .OrderByDescending(a => a.Date)
-            .ToListAsync();
-            ViewBag.transactions = saved;
-            // overview data
-            var transactionOverview = saved
-            .GroupBy(t => t.Asset.Name) // Group by Asset Name
-            .Select(g => new
+            if (portfolioID != null)
             {
-                AssetName = g.Key, // The name of the asset
-                TotalQuantity = g.Sum(t => t.Quantity), // Sum of quantities for this asset
-                AveragePrice = g.Average(t => t.Price), // Average price for this asset
-                CurrentAssetPrice = g.First().Asset.Price,
-                ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price)) - 1
-            })
-            .ToList();
-            ViewBag.overview = transactionOverview;
-            //total portfolio networth
-            // Calculate portfolio net worth
-            var portfolioNetWorth = saved
+                var saved = await _context.Transakcijas
+                .Where(wa => wa.PortfolioId == portfolioID.Id)
+                .Include(p => p.Asset)
+                .OrderByDescending(a => a.Date)
+                .ToListAsync();
+                ViewBag.transactions = saved;
+                // overview data
+                var transactionOverview = saved
                 .GroupBy(t => t.Asset.Name) // Group by Asset Name
-                .Select(g => g.Sum(t => (decimal)t.Quantity * (decimal)t.Asset.Price)) // Calculate total value for each asset
-                .Sum(); // Sum up the total values of all assets
-            ViewBag.PortfolioNetWorth = portfolioNetWorth;
+                .Select(g => new
+                {
+                    AssetName = g.Key, // The name of the asset
+                    TotalQuantity = g.Sum(t => t.Quantity), // Sum of quantities for this asset
+                    AveragePrice = g.Average(t => t.Price), // Average price for this asset
+                    CurrentAssetPrice = g.First().Asset.Price,
+                    ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price)) - 1
+                })
+                .ToList();
+                ViewBag.overview = transactionOverview;
+                //total portfolio networth
+                // Calculate portfolio net worth
+                var portfolioNetWorth = saved
+                    .GroupBy(t => t.Asset.Name) // Group by Asset Name
+                    .Select(g => g.Sum(t => (decimal)t.Quantity * (decimal)t.Asset.Price)) // Calculate total value for each asset
+                    .Sum(); // Sum up the total values of all assets
+                ViewBag.PortfolioNetWorth = portfolioNetWorth;
+            }
+
             //user id
             ViewBag.UserId = currentUser.Id;
             return View(portfolios ?? new List<Portfolio>());
