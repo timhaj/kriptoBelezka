@@ -61,15 +61,30 @@ namespace web.Controllers
                     .Select(g => g.Sum(t => (decimal)t.Quantity * (decimal)t.Asset.Price)) // Calculate total value for each asset
                     .Sum(); // Sum up the total values of all assets
                 ViewBag.PortfolioNetWorth = portfolioNetWorth;
-                
-                foreach(var t in saved){//dobimo zadnji transaction
+
+                foreach (var t in saved)
+                {//dobimo zadnji transaction
                     ViewBag.lastTransaction = t;
                 }
-                
+
             }
 
             //user id
             ViewBag.UserId = currentUser.Id;
+            if (currentUser != null)
+            {
+                var nastavitve = await _context.Nastavitves
+                                            .Where(s => s.OwnerId == currentUser)
+                                            .FirstOrDefaultAsync();
+                if (nastavitve != null && nastavitve.IsDarkMode == true)
+                {
+                    ViewBag.mode = "dark";
+                }
+                else
+                {
+                    ViewBag.mode = "light";
+                }
+            }
             return View(portfolios ?? new List<Portfolio>());
         }
 

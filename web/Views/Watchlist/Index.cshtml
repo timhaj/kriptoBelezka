@@ -4,6 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
+<input type="hidden" id="saved-theme" value="@ViewBag.mode" />
 <h1>My Watchlist</h1>
 
 <table class="table">
@@ -16,27 +17,47 @@
         </tr>
     </thead>
     <tbody>
-        
-@foreach (var item in Model) {
-        <tr>
-            <td class="email_prikaz">
-                
-                @Html.DisplayFor(modelItem => item.OwnerId.Email);
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
-            </td>
-        </tr>
-}
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="email_prikaz">
+
+                    @Html.DisplayFor(modelItem => item.OwnerId.Email);
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <script>
-    
+
     let td_list = document.getElementsByClassName("email_prikaz");
-        console.log(td_list)
+    console.log(td_list)
     for (let index = 0; index < td_list.length; index++) {
-        td_list[index].innerHTML =  td_list[index].innerHTML.substring(0,td_list[index].innerHTML.indexOf( String.fromCharCode(64) ));
+        td_list[index].innerHTML = td_list[index].innerHTML.substring(0, td_list[index].innerHTML.indexOf(String.fromCharCode(64)));
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
 </script>

@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
+<input type="hidden" id="saved-theme" value="@ViewBag.mode" />
 <h1>Edit</h1>
 
 <h4>Nastavitve</h4>
@@ -30,3 +30,25 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
+</script>

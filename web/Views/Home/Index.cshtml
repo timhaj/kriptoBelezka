@@ -7,7 +7,8 @@
     <h2 style="text-align: center; font-family: monospace; color: #5b4e77; margin-bottom: 20px;">
         🚀 Današnje stanje na trgu kriptovalut 🚀
     </h2>
-    <table data-show-multi-sort class="table table-striped striped-table table-hover align-middle">
+    <table data-show-multi-sort class="table table-striped striped-table table-hover align-middle table-dark"
+        id="mainpage-table">
         <thead>
             <tr>
                 <th>Rank</th>
@@ -163,5 +164,29 @@
         }
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+        const table = document.getElementById("mainpage-table");
 
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+            if (theme === "dark") {
+                table.classList.add("table-dark");
+            } else {
+                table.classList.remove("table-dark");
+            }
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
 </script>

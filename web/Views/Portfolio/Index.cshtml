@@ -34,7 +34,7 @@
     </tbody>
 </table> *@
 
-
+<input type="hidden" id="saved-theme" value="@ViewBag.mode" />
 <div>
     @if (!Model.Any())
     {
@@ -179,7 +179,7 @@
             ...t,
             Date: normalizeDate(new Date(t.Date))
         }));
-
+        console.log(parsedTransactions);
         // Objekt za shranjevanje vrednosti portfelja za vsak dan
         const portfolioValues = {};
 
@@ -242,16 +242,11 @@
     }
 
     var lastDate = '@ViewBag.lastTransaction.Date.ToString("yyyy-MM-ddTHH:mm:ss")';
-    console.log(lastDate);
     // Primer uporabe
     var startDate2 = new Date(lastDate);
-    console.log(startDate2);
     const days = getDaysWithMonthNames(startDate2);
-    console.log(days);
-    console.log("baba");
     // Testiranje funkcije
     const portfolio = calculatePortfolioValue(podatki, startDate2);
-
     const portfolioValues = Object.values(portfolio);
 
     const data = {
@@ -297,5 +292,23 @@
 
 
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
 
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
 </script>

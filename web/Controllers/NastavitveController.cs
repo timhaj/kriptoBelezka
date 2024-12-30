@@ -99,6 +99,20 @@ namespace web.Controllers
                 _context.Nastavitves.Add(nastavitve);
                 await _context.SaveChangesAsync();
             }
+            if (currentUser != null)
+            {
+                var nastavitves = await _context.Nastavitves
+                                            .Where(s => s.OwnerId == currentUser)
+                                            .FirstOrDefaultAsync();
+                if (nastavitves != null && nastavitves.IsDarkMode == true)
+                {
+                    ViewBag.mode = "dark";
+                }
+                else
+                {
+                    ViewBag.mode = "light";
+                }
+            }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             return View(nastavitve);
         }

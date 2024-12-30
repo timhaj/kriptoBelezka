@@ -41,7 +41,20 @@ namespace web.Controllers
                 _context.Watchlists.Add(watchlist);
                 await _context.SaveChangesAsync();
             }
-
+            if (currentUser != null)
+            {
+                var nastavitve = await _context.Nastavitves
+                                            .Where(s => s.OwnerId == currentUser)
+                                            .FirstOrDefaultAsync();
+                if (nastavitve != null && nastavitve.IsDarkMode == true)
+                {
+                    ViewBag.mode = "dark";
+                }
+                else
+                {
+                    ViewBag.mode = "light";
+                }
+            }
             string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
 
             using (HttpClient client = new HttpClient())
@@ -151,6 +164,21 @@ namespace web.Controllers
             };
 
             viewModel.Assets = await _context.Assets.ToListAsync(); // Pridobite vse assete iz baze
+            var currentUser = await _usermanager.GetUserAsync(User);
+            if (currentUser != null)
+            {
+                var nastavitve = await _context.Nastavitves
+                                            .Where(s => s.OwnerId == currentUser)
+                                            .FirstOrDefaultAsync();
+                if (nastavitve != null && nastavitve.IsDarkMode == true)
+                {
+                    ViewBag.mode = "dark";
+                }
+                else
+                {
+                    ViewBag.mode = "light";
+                }
+            }
 
             // Pošlji ViewModel na pogled
             return View(viewModel);

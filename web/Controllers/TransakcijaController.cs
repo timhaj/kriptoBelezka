@@ -59,6 +59,20 @@ namespace web.Controllers
             var assets = await _context.Assets.ToListAsync();
             ViewBag.Assets = assets;
             ViewBag.PortId = portfolio;
+            if (currentUser != null)
+            {
+                var nastavitve = await _context.Nastavitves
+                                            .Where(s => s.OwnerId == currentUser)
+                                            .FirstOrDefaultAsync();
+                if (nastavitve != null && nastavitve.IsDarkMode == true)
+                {
+                    ViewBag.mode = "dark";
+                }
+                else
+                {
+                    ViewBag.mode = "light";
+                }
+            }
             ViewData["AssetId"] = new SelectList(_context.Assets, "Id", "Id");
             ViewData["PortfolioId"] = new SelectList(_context.Portfolios, "Id", "Id");
             return View();

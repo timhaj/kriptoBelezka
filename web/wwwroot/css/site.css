@@ -161,3 +161,13 @@ td>span {
 .portfolio-add-button-link:active {
   text-decoration: none;
 }
+
+body.light-mode {
+  background-color: white;
+  color: black;
+}
+
+body.dark-mode {
+  background-color: black;
+  color: white;
+}
