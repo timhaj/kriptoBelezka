@@ -13,11 +13,11 @@
             <tr>
                 <th>Rank</th>
                 <th>Name</th>
-                <th>Price (USD)</th>
+                <th>Price (@ViewBag.CurSymbol)</th>
                 <th>Supply</th>
                 <th>Max Supply</th>
-                <th>Market Cap (USD)</th>
-                <th>24Hr Volume (USD)</th>
+                <th>Market Cap (@ViewBag.CurSymbol)</th>
+                <th>24Hr Volume (@ViewBag.CurSymbol)</th>
                 <th>Change 24Hr (%)</th>
             </tr>
         </thead>
@@ -27,19 +27,30 @@
                 <tr>
                     <td>@crypto.Rank</td>
                     <td><strong>@crypto.Name</strong> <span>(@crypto.Symbol)</span></td>
-                    <td>$@{
+                    <td>@{
                             //dolar se spremeni po potrebi iz nastavitev
                             //popravi vejice na 1000ice
+                            string currentRateString = ViewBag.CurrentRate?.ToString();
                             string priceUsd = crypto.PriceUsd;
                             string formattedPrice = "Invalid Price";
 
                             if (!string.IsNullOrWhiteSpace(priceUsd) && priceUsd.Contains("."))
                             {
-                                int dotIndex = priceUsd.IndexOf(".");
-                                formattedPrice = priceUsd.Substring(0, dotIndex + 3); // Include up to 2 decimals
+                                // Parse strings to decimal
+                                decimal price = decimal.Parse(priceUsd, System.Globalization.CultureInfo.InvariantCulture);
+                                decimal currentRate = decimal.Parse(currentRateString,
+                                System.Globalization.CultureInfo.InvariantCulture);
+
+                                // Divide price by current rate
+                                decimal adjustedPrice = price / currentRate;
+                                //Console.WriteLine(adjustedPrice + " " + priceUsd);
+                                //int dotIndex = priceUsd.IndexOf(".");
+                                //formattedPrice = priceUsd.Substring(0, dotIndex + 3); // Include up to 2 decimals
+                                formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
                             }
 
                             @formattedPrice
+                            @ViewBag.CurrentSymbol
                         }
                     </td>
                     <td class="supply">
@@ -72,27 +83,48 @@
                     <td class="mcap">@{
                             string marketCapUsd = crypto.MarketCapUsd;
                             string formattedMarketCapUsd = "N/A";
+                            currentRateString = ViewBag.CurrentRate?.ToString();
 
                             if (!string.IsNullOrWhiteSpace(marketCapUsd) && marketCapUsd.Contains("."))
                             {
-                                int dotIndex = marketCapUsd.IndexOf(".");
-                                formattedMarketCapUsd = marketCapUsd.Substring(0, dotIndex);
+                                // Parse strings to decimal
+                                decimal marketCap = decimal.Parse(marketCapUsd, System.Globalization.CultureInfo.InvariantCulture);
+                                decimal currentRate = decimal.Parse(currentRateString,
+                                System.Globalization.CultureInfo.InvariantCulture);
+
+                                // Adjust market cap by the current rate
+                                decimal adjustedMarketCap = marketCap / currentRate;
+                                //int dotIndex = marketCapUsd.IndexOf(".");
+                                //formattedMarketCapUsd = marketCapUsd.Substring(0, dotIndex);
+                                formattedMarketCapUsd = adjustedMarketCap.ToString("N0",
+                                System.Globalization.CultureInfo.InvariantCulture);
                             }
 
                             @formattedMarketCapUsd
+                            @ViewBag.CurrentSymbol
                         }
                     </td>
                     <td class="volume">@{
                             string volumeUsd24Hr = crypto.VolumeUsd24Hr;
                             string formattedvolumeUsd24Hr = "N/A";
+                            currentRateString = ViewBag.CurrentRate?.ToString();
 
                             if (!string.IsNullOrWhiteSpace(volumeUsd24Hr) && volumeUsd24Hr.Contains("."))
                             {
-                                int dotIndex = volumeUsd24Hr.IndexOf(".");
-                                formattedvolumeUsd24Hr = volumeUsd24Hr.Substring(0, dotIndex);
+                                // Parse strings to decimal
+                                decimal volume = decimal.Parse(volumeUsd24Hr, System.Globalization.CultureInfo.InvariantCulture);
+                                decimal currentRate = decimal.Parse(currentRateString,
+                                System.Globalization.CultureInfo.InvariantCulture);
+                                // Adjust volume by the current rate
+                                decimal adjustedVolume = volume / currentRate;
+                                //int dotIndex = volumeUsd24Hr.IndexOf(".");
+                                //formattedvolumeUsd24Hr = volumeUsd24Hr.Substring(0, dotIndex);
+                                formattedvolumeUsd24Hr = adjustedVolume.ToString("N0",
+                                System.Globalization.CultureInfo.InvariantCulture);
                             }
 
                             @formattedvolumeUsd24Hr
+                            @ViewBag.CurrentSymbol
                         }
                     </td>
                     <td class="change">@{
@@ -135,17 +167,17 @@
         }
     }
 
-    for (let i = 0; i < 100; i++) {
+    @*     for (let i = 0; i < 100; i++) {
         value = document.getElementsByClassName('mcap')[i].innerHTML;
         value = BigInt(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         document.getElementsByClassName('mcap')[i].innerHTML = "$" + value;
-    }
+    } *@
 
-    for (let i = 0; i < 100; i++) {
+    @*     for (let i = 0; i < 100; i++) {
         value = document.getElementsByClassName('volume')[i].innerHTML;
         value = BigInt(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         document.getElementsByClassName('volume')[i].innerHTML = "$" + value;
-    }
+    } *@
 
     for (let i = 0; i < 100; i++) {
         value = document.getElementsByClassName('supply')[i].innerHTML;

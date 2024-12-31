@@ -49,7 +49,30 @@
         <div class="portfolio-main">
             <div>
                 <h2>My portfolio</h2>
-                <p class="portfolio-networth h1 fw-bold">@ViewBag.PortfolioNetWorth</p>
+                <p class="portfolio-networth h1 fw-bold">
+                        @{
+                    string portfolioNetWorthString = ViewBag.PortfolioNetWorth?.ToString();
+                    string formattedPortfolioNetWorth = "N/A";
+                    // Get the current rate from ViewBag
+                    string currentRateString = ViewBag.CurrentRate?.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(portfolioNetWorthString) && !string.IsNullOrWhiteSpace(currentRateString))
+                    {
+                            // Parse strings to decimal
+                            decimal portfolioNetWorth = decimal.Parse(portfolioNetWorthString);
+                            decimal currentRate = decimal.Parse(currentRateString, System.Globalization.CultureInfo.InvariantCulture);
+
+                            // Adjust portfolio net worth by the current rate
+                            decimal adjustedPortfolioNetWorth = portfolioNetWorth / currentRate;
+
+                            // Format to two decimal places with thousands separator
+                            formattedPortfolioNetWorth = adjustedPortfolioNetWorth.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                    }
+
+                    @formattedPortfolioNetWorth
+                    @ViewBag.CurrentSymbol
+                }
+                </p>
             </div>
             <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
                     class="portfolio-add-button-link">+ Add transaction</a></button>
@@ -80,7 +103,32 @@
                     <tr>
                         <td>@t.Date</td>
                         <td>@t.Asset.Name</td>
-                        <td>@t.Price</td>
+                        <td>
+                            @{
+                                string priceString = t.Price?.ToString();
+                                string formattedPrice = "N/A";
+
+                                // Get the current rate from ViewBag
+                                currentRateString = ViewBag.CurrentRate?.ToString();
+
+                                if (!string.IsNullOrWhiteSpace(priceString) && !string.IsNullOrWhiteSpace(currentRateString))
+                                {
+                                    // Parse strings to decimal
+                                    decimal price = decimal.Parse(priceString);
+                                    decimal currentRate = decimal.Parse(currentRateString,
+                                    System.Globalization.CultureInfo.InvariantCulture);
+
+                                    // Adjust price by the current rate
+                                    decimal adjustedPrice = price / currentRate;
+
+                                    // Format to two decimal places
+                                    formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+
+                                @formattedPrice
+                                @ViewBag.CurrentSymbol
+                            }
+                        </td>
                         <td>@t.Quantity</td>
                     </tr>
                 }
@@ -101,9 +149,59 @@
                 {
                     <tr>
                         <td>@t.AssetName</td>
-                        <td>@t.CurrentAssetPrice</td>
+                        <td>
+                            @{
+                                string currentAssetPriceString = t.CurrentAssetPrice?.ToString();
+                                string formattedCurrentAssetPrice = "N/A";
+
+                                // Get the current rate from ViewBag
+                                currentRateString = ViewBag.CurrentRate?.ToString();
+
+                                if (!string.IsNullOrWhiteSpace(currentAssetPriceString) &&
+                                !string.IsNullOrWhiteSpace(currentRateString))
+                                {
+                                    // Parse strings to decimal
+                                    decimal currentAssetPrice = decimal.Parse(currentAssetPriceString);
+                                    decimal currentRate = decimal.Parse(currentRateString,
+                                    System.Globalization.CultureInfo.InvariantCulture);
+
+                                    // Adjust price by the current rate
+                                    decimal adjustedCurrentAssetPrice = currentAssetPrice / currentRate;
+
+                                    // Format to two decimal places
+                                    formattedCurrentAssetPrice = adjustedCurrentAssetPrice.ToString("N2",
+                                    System.Globalization.CultureInfo.InvariantCulture);
+                                }
+
+                                @formattedCurrentAssetPrice
+                                @ViewBag.CurrentSymbol
+                            }
+                        </td>
                         <td>@t.TotalQuantity</td>
-                        <td>@t.AveragePrice</td>
+                        <td>
+                            @{
+                    string averagePriceString = t.AveragePrice?.ToString();
+                    string formattedAveragePrice = "N/A";
+                    // Get the current rate from ViewBag
+                    currentRateString = ViewBag.CurrentRate?.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(averagePriceString) && !string.IsNullOrWhiteSpace(currentRateString))
+                    {
+                            // Parse strings to decimal
+                            decimal averagePrice = decimal.Parse(averagePriceString);
+                            decimal currentRate = decimal.Parse(currentRateString, System.Globalization.CultureInfo.InvariantCulture);
+
+                            // Adjust price by the current rate
+                            decimal adjustedAveragePrice = averagePrice / currentRate;
+
+                            // Format to two decimal places
+                            formattedAveragePrice = adjustedAveragePrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                    }
+
+                    @formattedAveragePrice
+                    @ViewBag.CurrentSymbol
+                }
+                        </td>
                         <td>
                             @if (t.ProfitLoss < 0)
                             {

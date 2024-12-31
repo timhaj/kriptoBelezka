@@ -9,6 +9,11 @@ using web.Data;
 using web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace web.Controllers
 {
@@ -87,6 +92,7 @@ namespace web.Controllers
                         } */
             var currentUser = await _usermanager.GetUserAsync(User);
             var nastavitve = await _context.Nastavitves.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
+
             if (nastavitve == null)
             {
                 nastavitve = new Nastavitve
@@ -99,6 +105,12 @@ namespace web.Controllers
                 _context.Nastavitves.Add(nastavitve);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                ViewBag.SavedCurrency = nastavitve;
+                Console.WriteLine(ViewBag.SavedCurrency.CurrentCurrencySelected);
+            }
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             if (currentUser != null)
             {
                 var nastavitves = await _context.Nastavitves
@@ -113,8 +125,39 @@ namespace web.Controllers
                     ViewBag.mode = "light";
                 }
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
+            string apiUrl = "https://api.coincap.io/v2/rates";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    var response = await client.GetStringAsync(apiUrl);
+                    var apiResult = JsonConvert.DeserializeObject<ApiResponse>(response);
+                    ViewBag.Rates = apiResult.Data;
+                    //return View();
+                }
+                catch (Exception ex)
+                {
+                    // Handle any errors
+                    ViewBag.Error = $"An error occurred: {ex.Message}";
+                }
+            }
+
             return View(nastavitve);
+        }
+
+
+        public class ApiResponse
+        {
+            public Rate[] Data { get; set; }
+        }
+
+        public class Rate
+        {
+            public string Id { get; set; }
+            public string Symbol { get; set; }
+            public string CurrencySymbol { get; set; }
+            public string Type { get; set; }
+            public string RateUsd { get; set; }
         }
 
         // POST: Nastavitve/Edit/5
@@ -124,6 +167,7 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,IsDarkMode,CurrentCurrencySelected")] Nastavitve nastavitve)
         {
+            Console.WriteLine("a lah");
             if (id != nastavitve.Id)
             {
                 return NotFound();

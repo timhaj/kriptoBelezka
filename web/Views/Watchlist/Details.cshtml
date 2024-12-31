@@ -49,8 +49,57 @@
             <tr>
                 <td>@savedItem.Id</td>
                 <td>@savedItem.Name</td>
-                <td>@savedItem.Price</td>
-                <td>@savedItem.MarketCap</td>
+                <td>
+                    @{
+                        string priceString = savedItem.Price.ToString();
+                        string formattedPrice = "N/A";
+
+                        // Get the current rate from ViewBag
+                        string currentRateString = ViewBag.CurrentRate?.ToString();
+
+                        if (!string.IsNullOrWhiteSpace(priceString) && !string.IsNullOrWhiteSpace(currentRateString))
+                        {
+                            // Parse strings to decimal
+                            decimal price = decimal.Parse(priceString);
+                            Console.WriteLine(price);
+                            decimal currentRate = decimal.Parse(currentRateString,
+                            System.Globalization.CultureInfo.InvariantCulture);
+
+                            // Adjust price by the current rate
+                            decimal adjustedPrice = price / currentRate;
+
+                            // Format to two decimal places
+                            formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                        }
+
+                        @formattedPrice
+                        @ViewBag.CurrentSymbol
+                    }
+                </td>
+                <td>
+                    @{
+                        string marketCapString = savedItem.MarketCap.ToString();
+                        string formattedMarketCap = "N/A";
+                        currentRateString = ViewBag.CurrentRate?.ToString();
+                        if (!string.IsNullOrWhiteSpace(marketCapString) && !string.IsNullOrWhiteSpace(currentRateString))
+                        {
+                            // Parse strings to decimal
+                            decimal marketCap = decimal.Parse(marketCapString);
+                            decimal currentRate = decimal.Parse(currentRateString,
+                            System.Globalization.CultureInfo.InvariantCulture);
+
+                            // Adjust market cap by the current rate
+                            decimal adjustedMarketCap = marketCap / currentRate;
+
+                            // Format to no decimal places with thousands separator
+                            formattedMarketCap = adjustedMarketCap.ToString("N0",
+                            System.Globalization.CultureInfo.InvariantCulture);
+                        }
+
+                        @formattedMarketCap
+                        @ViewBag.CurrentSymbol
+                    }
+                </td>
                 <td>@savedItem.CurrentSupply</td>
                 <td>@savedItem.MaxSupply</td>
                 <td>@savedItem.ChangePercent24Hr</td>

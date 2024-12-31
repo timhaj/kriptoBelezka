@@ -41,6 +41,33 @@ public class HomeController : Controller
             {
                 ViewBag.mode = "light";
             }
+
+            if (nastavitve != null)
+            {
+                string ratesAPI = "https://api.coincap.io/v2/rates";
+                using (HttpClient client = new HttpClient())
+                {
+                    try
+                    {
+                        var response = await client.GetStringAsync(ratesAPI);
+                        var apiResultRates = JsonConvert.DeserializeObject<ApiResponse2>(response);
+                        var matchingRate = apiResultRates?.Data.FirstOrDefault(rate => rate.Id.Equals(nastavitve.CurrentCurrencySelected, StringComparison.OrdinalIgnoreCase));
+                        Console.WriteLine(matchingRate.RateUsd);
+                        ViewBag.CurrentRate = matchingRate.RateUsd;
+                        ViewBag.CurrentSymbol = matchingRate.CurrencySymbol;
+                        ViewBag.CurSymbol = matchingRate.Symbol;
+                    }
+                    catch (Exception ex)
+                    {
+                        ViewBag.Error = $"An error occurred: {ex.Message}";
+                    }
+                }
+                Console.WriteLine(nastavitve.CurrentCurrencySelected);
+            }
+            else
+            {
+                ViewBag.CurrentRate = 1;
+            }
         }
 
         string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
@@ -56,6 +83,55 @@ public class HomeController : Controller
 
         return View();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class ApiResponse2
+    {
+        public Rate[] Data { get; set; }
+    }
+
+    public class Rate
+    {
+        public string Id { get; set; }
+        public string Symbol { get; set; }
+        public string CurrencySymbol { get; set; }
+        public string Type { get; set; }
+        public string RateUsd { get; set; }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Helper classes to map the API response
     public class ApiResponse
