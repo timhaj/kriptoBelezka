@@ -50,37 +50,63 @@
             <div>
                 <h2>My portfolio</h2>
                 <p class="portfolio-networth h1 fw-bold">
-                        @{
-                    string portfolioNetWorthString = ViewBag.PortfolioNetWorth?.ToString();
-                    string formattedPortfolioNetWorth = "N/A";
-                    // Get the current rate from ViewBag
-                    string currentRateString = ViewBag.CurrentRate?.ToString();
+                    @{
+                        string portfolioNetWorthString = ViewBag.PortfolioNetWorth?.ToString();
+                        string formattedPortfolioNetWorth = "N/A";
+                        // Get the current rate from ViewBag
+                        string currentRateString = ViewBag.CurrentRate?.ToString();
 
-                    if (!string.IsNullOrWhiteSpace(portfolioNetWorthString) && !string.IsNullOrWhiteSpace(currentRateString))
-                    {
+                        if (!string.IsNullOrWhiteSpace(portfolioNetWorthString) &&
+                        !string.IsNullOrWhiteSpace(currentRateString))
+                        {
                             // Parse strings to decimal
                             decimal portfolioNetWorth = decimal.Parse(portfolioNetWorthString);
-                            decimal currentRate = decimal.Parse(currentRateString, System.Globalization.CultureInfo.InvariantCulture);
+                            decimal currentRate = decimal.Parse(currentRateString,
+                            System.Globalization.CultureInfo.InvariantCulture);
 
                             // Adjust portfolio net worth by the current rate
                             decimal adjustedPortfolioNetWorth = portfolioNetWorth / currentRate;
 
                             // Format to two decimal places with thousands separator
-                            formattedPortfolioNetWorth = adjustedPortfolioNetWorth.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
-                    }
+                            formattedPortfolioNetWorth = adjustedPortfolioNetWorth.ToString("N2",
+                            System.Globalization.CultureInfo.InvariantCulture);
+                        }
 
-                    @formattedPortfolioNetWorth
-                    @ViewBag.CurrentSymbol
-                }
+                        @formattedPortfolioNetWorth
+                        @ViewBag.CurrentSymbol
+                    }
                 </p>
             </div>
             <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
                     class="portfolio-add-button-link">+ Add transaction</a></button>
         </div>
 
-        <div>
-            <canvas id="myChart"></canvas>
+        <div class="d-flex" style="width: 45vw;">
+            <canvas id="myChart" width="400" height="400"></canvas>
+            <canvas id="myChart2" width="400" height="400"></canvas>
         </div>
+
+        <table style="display: none;">
+            <thead>
+                <tr>
+                    <th class="pe-5">Date</th>
+                    <th class="pe-5">Asset</th>
+                    <th class="pe-5">Price</th>
+                    <th class="pe-5">Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="parsed_podatki">
+                @foreach (var t in @ViewBag.transactions)
+                {
+                    <tr>
+                        <td>@t.Date.ToString("yyyy-MM-ddTHH:mm:ss")</td>
+                        <td>@t.Asset.Name</td>
+                        <td>@t.Price</td>
+                        <td>@t.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
 
         <hr>
@@ -180,27 +206,29 @@
                         <td>@t.TotalQuantity</td>
                         <td>
                             @{
-                    string averagePriceString = t.AveragePrice?.ToString();
-                    string formattedAveragePrice = "N/A";
-                    // Get the current rate from ViewBag
-                    currentRateString = ViewBag.CurrentRate?.ToString();
+                                string averagePriceString = t.AveragePrice?.ToString();
+                                string formattedAveragePrice = "N/A";
+                                // Get the current rate from ViewBag
+                                currentRateString = ViewBag.CurrentRate?.ToString();
 
-                    if (!string.IsNullOrWhiteSpace(averagePriceString) && !string.IsNullOrWhiteSpace(currentRateString))
-                    {
-                            // Parse strings to decimal
-                            decimal averagePrice = decimal.Parse(averagePriceString);
-                            decimal currentRate = decimal.Parse(currentRateString, System.Globalization.CultureInfo.InvariantCulture);
+                                if (!string.IsNullOrWhiteSpace(averagePriceString) && !string.IsNullOrWhiteSpace(currentRateString))
+                                {
+                                    // Parse strings to decimal
+                                    decimal averagePrice = decimal.Parse(averagePriceString);
+                                    decimal currentRate = decimal.Parse(currentRateString,
+                                    System.Globalization.CultureInfo.InvariantCulture);
 
-                            // Adjust price by the current rate
-                            decimal adjustedAveragePrice = averagePrice / currentRate;
+                                    // Adjust price by the current rate
+                                    decimal adjustedAveragePrice = averagePrice / currentRate;
 
-                            // Format to two decimal places
-                            formattedAveragePrice = adjustedAveragePrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
-                    }
+                                    // Format to two decimal places
+                                    formattedAveragePrice = adjustedAveragePrice.ToString("N2",
+                                    System.Globalization.CultureInfo.InvariantCulture);
+                                }
 
-                    @formattedAveragePrice
-                    @ViewBag.CurrentSymbol
-                }
+                                @formattedAveragePrice
+                                @ViewBag.CurrentSymbol
+                            }
                         </td>
                         <td>
                             @if (t.ProfitLoss < 0)
@@ -220,7 +248,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Get references to the buttons and tables
+    // Tole je tudi good
     const holdingsSwitcher = document.querySelector('.portfolio-holdings-switcher');
     const transactionsSwitcher = document.querySelector('.portfolio-transaction-switcher');
     const holdingsTable = document.querySelector('.portfolio-overview-tab');
@@ -250,17 +278,322 @@
     transactionsTable.style.display = 'none'; // Hide transactions table by default
 
 
+
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+
+    //dobis vse dneve od prve transakcije do vcerajsnega datuma
+    function getDaysWithMonthNames(startDate) {
+        var currentDates = new Date();
+        currentDates.setDate(currentDates.getDate() + 1);
+        var endDate = new Date(); // Današnji datum
+        endDate = currentDates;
+        const daysWithMonthNames = [];
+        // Nastavite začetni datum na začetni datum (ura nastavljena na 00:00:00)
+        startDate.setHours(0, 0, 0, 0);
+        // Preverite, ali je začetni datum pred današnjim datumom
+        if (startDate > endDate) {
+            console.error('Začetni datum ne sme biti kasnejši od današnjega datuma.');
+            return [];
+        }
+        // Zanka za iteracijo skozi dni
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            const formattedDate = date.toISOString().split('T')[0]; // Format: yyyy-MM-dd
+            daysWithMonthNames.push(`${formattedDate}`);
+        }
+        return daysWithMonthNames;
+    }
+
+    var lastDate = '@ViewBag.lastTransaction.Date.ToString("yyyy-MM-ddTHH:mm:ss")';
+    var startDate2 = new Date(lastDate);
+    const days = getDaysWithMonthNames(startDate2);
+
+    var date = new Date(startDate2);
+    var milliseconds_first_transaction = date.getTime();
+    var today_date = new Date();
+    var milliseconds_today = today_date.getTime();
+
+    @*     var apiURL = "https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=" + milliseconds_first_transaction + "&end=" + milliseconds_today;
+    let fetchRes = fetch(apiURL);
+    fetchRes.then(res =>
+        res.json()).then(d => {
+            console.log(d);
+        }) *@
+
     // Pridobimo vse vrstice iz <tbody> z ID-jem data-transactions
-    const rows = document.querySelectorAll("#podatki tr");
+    const rows = document.querySelectorAll("#parsed_podatki tr");
+
+    const podatki = [];
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const obj = {
+            Date: cells[0].textContent.trim(),
+            Name: cells[1].textContent.trim(),
+            Price: parseFloat(cells[2].textContent.trim()),
+            Quantity: parseFloat(cells[3].textContent.trim())
+        };
+        podatki.push(obj);
+    });
+
+    // Prikaz podatkov v konzoli
+    console.log("parsed_podatki");
+    console.log(podatki);
+
+    var currentRate = @ViewBag.CurrentRate;
+    console.log(currentRate);
+
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
 
 
-
-
-
-
-
-
-    // Funkcija za normalizacijo datumov (nastavi čas na 00:00:00)
+    @*     // Funkcija za normalizacijo datumov (nastavi čas na 00:00:00)
     function normalizeDate(date) {
         const normalized = new Date(date);
         normalized.setHours(0, 0, 0, 0);
@@ -299,97 +632,288 @@
         return portfolioValues;
     }
 
-    // Inicializiramo seznam objektov
-    const podatki = [];
+    const portfolio = calculatePortfolioValue(podatki, startDate2);
+    const portfolioValues = Object.values(portfolio); *@
 
-    // Iteriramo skozi vrstice in pridobimo podatke
-    rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        const obj = {
-            Date: cells[0].textContent.trim(),
-            Name: cells[1].textContent.trim(),
-            Price: parseFloat(cells[2].textContent.trim()),
-            Quantity: parseFloat(cells[3].textContent.trim())
-        };
-        podatki.push(obj);
-    });
-
-    // Prikaz podatkov v konzoli
-    console.log(podatki);
-
-
-    function getDaysWithMonthNames(startDate) {
-        const endDate = new Date(); // Današnji datum
-        const daysWithMonthNames = [];
-
-        // Nastavite začetni datum na začetni datum (ura nastavljena na 00:00:00)
-        startDate.setHours(0, 0, 0, 0);
-
-        // Preverite, ali je začetni datum pred današnjim datumom
-        if (startDate > endDate) {
-            console.error('Začetni datum ne sme biti kasnejši od današnjega datuma.');
-            return [];
+        // Helper function to normalize a date to 00:00:00
+        function normalizeDate(date) {
+            const normalized = new Date(date);
+            normalized.setHours(0, 0, 0, 0);
+            return normalized;
         }
 
-        // Zanka za iteracijo skozi dni
-        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-            const formattedDate = date.toISOString().split('T')[0]; // Format: yyyy-MM-dd
-            daysWithMonthNames.push(`${formattedDate}`);
-        }
-        return daysWithMonthNames;
+    // Function to fetch historical prices for a specific asset
+    async function fetchHistoricalPrices(assetName, startDate, endDate) {
+        const apiURL = `https://api.coincap.io/v2/assets/${assetName.toLowerCase()}/history?interval=d1&start=${startDate.getTime()}&end=${endDate.getTime()}`;
+        const response = await fetch(apiURL);
+        const data = await response.json();
+        return data.data.reduce((acc, entry) => {
+            acc[normalizeDate(entry.time).toISOString()] = parseFloat(entry.priceUsd);
+            return acc;
+        }, {});
     }
 
-    var lastDate = '@ViewBag.lastTransaction.Date.ToString("yyyy-MM-ddTHH:mm:ss")';
-    // Primer uporabe
-    var startDate2 = new Date(lastDate);
-    const days = getDaysWithMonthNames(startDate2);
-    // Testiranje funkcije
-    const portfolio = calculatePortfolioValue(podatki, startDate2);
-    const portfolioValues = Object.values(portfolio);
+    // Function to calculate total portfolio value per day
+    async function calculatePortfolioValuePerDay(transactions, days) {
+        const assets = [...new Set(transactions.map(t => t.Name))]; // Unique assets
+        const startDate = normalizeDate(new Date(days[0]));
+        const endDate = normalizeDate(new Date(days[days.length - 1]));
+        // Fetch historical prices for each asset
+        const historicalPrices = {};
+        for (const asset of assets) {
+            historicalPrices[asset] = await fetchHistoricalPrices(asset, startDate, endDate);
+        }
+        // Calculate portfolio value for each day
+        const portfolioValues = days.reduce((acc, day) => {
+            const normalizedDay = normalizeDate(day).toISOString();
+            let dailyTotal = 0;
+            //console.log(day);
+            //console.log(normalizedDay);
+            transactions.forEach(transaction => {
+                const transactionDate = normalizeDate(transaction.Date).toISOString();
+                if (transactionDate <= normalizedDay) {
+                    const assetPrice = historicalPrices[transaction.Name][normalizedDay];
+                    if (assetPrice) {
+                        dailyTotal += (assetPrice * transaction.Quantity) / currentRate;
+                    }
+                }
+            });
 
-    const data = {
-        labels: days, // Dnevi v decembru
-        datasets: [{
-            label: 'Cena portfelija',
-            data: portfolioValues, // Cene portfelija za vsak dan
-            borderColor: 'rgb(100, 192, 192)',
-            backgroundColor: 'rgba(100, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.1
-        }]
-    };
+            acc[normalizedDay] = dailyTotal;
+            return acc;
+        }, {});
 
-    // Konfiguracija grafa
-    const config = {
-        type: 'line',
-        data: data,
-        options: {
-            responsive: true,
-            plugins: {
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Dan'
+
+        // Calculate asset allocation for the last day
+        const lastDay = normalizeDate(days[days.length - 2]).toISOString();
+        const lastDayAllocation = {};
+        let totalValueOnLastDay = 0;
+
+        transactions.forEach(transaction => {
+            const transactionDate = normalizeDate(transaction.Date).toISOString();
+            if (transactionDate <= lastDay) {
+                const assetPrice = historicalPrices[transaction.Name][lastDay];
+                if (assetPrice) {
+                    const assetValue = assetPrice * transaction.Quantity;
+                    lastDayAllocation[transaction.Name] = (lastDayAllocation[transaction.Name] || 0) + assetValue;
+                    totalValueOnLastDay += assetValue;
+                }
+            }
+        });
+
+        // Convert allocation to percentages
+        const assetAllocation = Object.keys(lastDayAllocation).reduce((acc, asset) => {
+            acc[asset] = lastDayAllocation[asset] / currentRate;
+            return acc;
+        }, {});
+
+        return {
+            portfolioValues: Object.values(portfolioValues), assetAllocation
+        };
+
+        //return Object.values(portfolioValues); // Return array of daily values
+    }
+
+
+    // Example usage
+    (async () => {
+        const portfolioValues = await calculatePortfolioValuePerDay(podatki, days);
+        yourFunction(portfolioValues);
+        console.log("Asset Allocation for Last Day:", portfolioValues.assetAllocation);
+    })();
+
+
+    function yourFunction(stuff) {
+        let foo = days.slice(0, -1);
+        let foo2 = stuff.portfolioValues.slice(0, -1);
+        const assetNames = Object.keys(stuff.assetAllocation);
+        const assetPercentages = Object.values(stuff.assetAllocation);
+        const data = {
+            labels: foo, // X AXIS
+            datasets: [{
+                label: 'Portfolio value',
+                data: foo2, // Y AXIS
+                borderColor: 'rgb(0, 171, 102)',
+                backgroundColor: 'rgba(0, 171, 102, 0.4)',
+                fill: true,
+                tension: 0.1
+            }]
+        };
+
+        // Konfiguracija grafa
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allow resizing
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Cena portfelija (€)'
+                scales: {
+                    x: {
+                        grid: {
+                            display: false // Disable gridlines for the x-axis
+                        },
+                        title: {
+                            display: true,
+                            text: 'Day'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Portfolio value (' + '@ViewBag.CurrentSymbol' + ')'
+                        }
+                    }
+                }
+            },
+        };
+
+        // Inicializirajte graf
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const ctx2 = document.getElementById('myChart2').getContext('2d');
+        new Chart(ctx, config);
+        new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: assetNames,
+                datasets: [{
+                    data: assetPercentages,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], // Customize colors
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allow resizing
+                plugins: {
+                    legend: {
+                        display: true
                     }
                 }
             }
-        },
-    };
+        });
+    }
 
-    // Inicializirajte graf
-    const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, config);
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
+    //CONFIG STUFF ZA CHARTJS
 
 
 
+
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE        
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
+    //SAM DA SE SE KJE JE GOOD KJE PA NE
     document.addEventListener("DOMContentLoaded", function () {
         const savedThemeInput = document.getElementById("saved-theme");
 

@@ -52,7 +52,7 @@ public class HomeController : Controller
                         var response = await client.GetStringAsync(ratesAPI);
                         var apiResultRates = JsonConvert.DeserializeObject<ApiResponse2>(response);
                         var matchingRate = apiResultRates?.Data.FirstOrDefault(rate => rate.Id.Equals(nastavitve.CurrentCurrencySelected, StringComparison.OrdinalIgnoreCase));
-                        Console.WriteLine(matchingRate.RateUsd);
+                        //Console.WriteLine(matchingRate.RateUsd);
                         ViewBag.CurrentRate = matchingRate.RateUsd;
                         ViewBag.CurrentSymbol = matchingRate.CurrencySymbol;
                         ViewBag.CurSymbol = matchingRate.Symbol;
@@ -62,12 +62,18 @@ public class HomeController : Controller
                         ViewBag.Error = $"An error occurred: {ex.Message}";
                     }
                 }
-                Console.WriteLine(nastavitve.CurrentCurrencySelected);
+                //Console.WriteLine(nastavitve.CurrentCurrencySelected);
             }
             else
             {
                 ViewBag.CurrentRate = 1;
             }
+        }
+        else
+        {
+            ViewBag.CurrentRate = 1;
+            ViewBag.CurrentSymbol = "$";
+            ViewBag.CurSymbol = "USD";
         }
 
         string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
