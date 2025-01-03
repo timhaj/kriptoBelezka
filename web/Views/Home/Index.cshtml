@@ -4,21 +4,20 @@
 
 <input type="hidden" id="saved-theme" value="@ViewBag.mode" />
 <div class="table-container">
-    <h2 style="text-align: center; font-family: monospace; color: #5b4e77; margin-bottom: 20px;">
-        🚀 Današnje stanje na trgu kriptovalut 🚀
+    <h2 style="text-align: left; font-family: monospace;margin-bottom: 20px;">
+        Realtime Cryptocurrency Prices by Market Cap
     </h2>
-    <table data-show-multi-sort class="table table-striped striped-table table-hover align-middle table-dark"
-        id="mainpage-table">
+    <table data-show-multi-sort class="table striped-table table-hover align-middle" id="mainpage-table">
         <thead>
             <tr>
                 <th>Rank</th>
-                <th>Name</th>
+                <th class="mainpage-table-name">Name</th>
                 <th>Price (@ViewBag.CurSymbol)</th>
                 <th>Supply</th>
                 <th>Max Supply</th>
                 <th>Market Cap (@ViewBag.CurSymbol)</th>
                 <th>24Hr Volume (@ViewBag.CurSymbol)</th>
-                <th>Change 24Hr (%)</th>
+                <th class="mainpage-table-change">Change 24Hr (%)</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +25,7 @@
             {
                 <tr>
                     <td>@crypto.Rank</td>
-                    <td><strong>@crypto.Name</strong> <span>(@crypto.Symbol)</span></td>
+                    <td class="mainpage-table-name"><strong>@crypto.Name</strong> <span>(@crypto.Symbol)</span></td>
                     <td>@{
                             //dolar se spremeni po potrebi iz nastavitev
                             //popravi vejice na 1000ice
@@ -46,7 +45,19 @@
                                 //Console.WriteLine(adjustedPrice + " " + priceUsd);
                                 //int dotIndex = priceUsd.IndexOf(".");
                                 //formattedPrice = priceUsd.Substring(0, dotIndex + 3); // Include up to 2 decimals
-                                formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                                if (adjustedPrice >= 0.1m)
+                                {
+                                    formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+                                else if (adjustedPrice > 0.01m && adjustedPrice < 0.1m)
+                                {
+                                    formattedPrice = adjustedPrice.ToString("N5", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+                                else
+                                {
+                                    formattedPrice = adjustedPrice.ToString("N10", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+
                             }
 
                             @formattedPrice
@@ -127,7 +138,7 @@
                             @ViewBag.CurrentSymbol
                         }
                     </td>
-                    <td class="change">@{
+                    <td class="change mainpage-table-change">@{
                             string changePercent24Hr = crypto.ChangePercent24Hr;
                             string formattedchangePercent24Hr = "N/A";
 
@@ -156,14 +167,14 @@
             svg_up = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
   <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
 </svg>`;
-            document.getElementsByClassName('change')[i].innerHTML = svg_up + ' ' + value;
+            document.getElementsByClassName('change')[i].innerHTML = svg_up + ' ' + value + "%";
         }
         else {
             document.getElementsByClassName('change')[i].classList.toggle("down");
             svg_down = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
             <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
         </svg>`;
-            document.getElementsByClassName('change')[i].innerHTML = svg_down + ' ' + value;
+            document.getElementsByClassName('change')[i].innerHTML = svg_down + ' ' + value + "%";
         }
     }
 
@@ -198,15 +209,31 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         const savedThemeInput = document.getElementById("saved-theme");
-        const table = document.getElementById("mainpage-table");
 
         // Apply the initial theme based on the value of the hidden input
         const applyTheme = (theme) => {
+            const navbarTheme = document.getElementById("navbar");
+            const navbar_titleTheme = document.getElementById("navbar_title");
+            const partial_footerTheme = document.getElementById("partial_footer");
+            const nav_linkTheme = document.getElementsByClassName("nav-link2");
+            const navbar_gearTheme = document.getElementById("navbar_gear");
+            const table = document.getElementById("mainpage-table");
+            if (theme == "dark") {
+                navbar_gearTheme.setAttribute("fill", "#f5acc6");
+                table.classList.add("dark-theme");
+                table.classList.remove("light-theme");
+            }
+            else {
+                navbar_gearTheme.setAttribute("fill", "#392d31");
+                table.classList.add("light-theme");
+                table.classList.remove("dark-theme");
+            }
             document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
-            if (theme === "dark") {
-                table.classList.add("table-dark");
-            } else {
-                table.classList.remove("table-dark");
+            navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
+            partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            for (let i = 0; i < nav_linkTheme.length; i++) {
+                nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
             }
         };
 
@@ -221,4 +248,8 @@
         // Start observing the hidden input for changes to the `value` attribute
         observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
     });
+
+    setInterval(() => {
+        location.reload();
+    }, 60000);
 </script>

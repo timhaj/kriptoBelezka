@@ -20,7 +20,7 @@
             <div class="dropdown">
                 <div class="form-group">
                     <label asp-for="Asset" class="control-label"></label>
-                    <input type="text" class="search-bar" id="searchInput" placeholder="Išči kripto žetone..."
+                    <input type="text" class="search-bar" id="searchInput" placeholder="Search crypto tokens..."
                         onkeyup="filterOptions()">
 
                     <div class="options-list" id="cryptoSelect" name="AssetId" required>
@@ -36,16 +36,19 @@
                 <label asp-for="AssetId" class="control-label"></label>
                 <select asp-for="AssetId" class="form-control" asp-items="ViewBag.AssetId"></select>
             </div> *@
+            <br>
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
                 <input asp-for="Quantity" class="form-control" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
+            <br>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
                 <input asp-for="Date" class="form-control" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
+            <br>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
@@ -53,14 +56,14 @@
             </div>
             <br>
             <div class="form-group">
-                <input type="submit" value="Add transaction" class="btn btn-primary" />
+                <input type="submit" value="Add transaction" class="btn" id="create_transaction_submit" />
             </div>
         </form>
     </div>
 </div>
 <br>
 <div>
-    <a asp-controller="Portfolio" asp-action="Index">Back to Portfolio</a>
+    <a asp-controller="Portfolio" asp-action="Index" id="create_transaction_back_to_portfolio">Back to Portfolio</a>
 </div>
 
 <script>
@@ -140,7 +143,24 @@
 
             // Apply the initial theme based on the value of the hidden input
             const applyTheme = (theme) => {
+                const navbarTheme = document.getElementById("navbar");
+                const navbar_titleTheme = document.getElementById("navbar_title");
+                const partial_footerTheme = document.getElementById("partial_footer");
+                const nav_linkTheme = document.getElementsByClassName("nav-link2");
+                const navbar_gearTheme = document.getElementById("navbar_gear");
+                if (theme == "dark") {
+                    navbar_gearTheme.setAttribute("fill", "#f5acc6");
+                }
+                else {
+                    navbar_gearTheme.setAttribute("fill", "#392d31");
+                }
                 document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+                navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
+                partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+                navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+                for (let i = 0; i < nav_linkTheme.length; i++) {
+                    nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+                }
             };
 
             // Initialize theme on page load

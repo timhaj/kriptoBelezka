@@ -167,7 +167,7 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,IsDarkMode,CurrentCurrencySelected")] Nastavitve nastavitve)
         {
-            Console.WriteLine("a lah");
+            nastavitve.IsDarkMode = !nastavitve.IsDarkMode;
             if (id != nastavitve.Id)
             {
                 return NotFound();
