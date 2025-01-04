@@ -1,7 +1,7 @@
 @model IEnumerable<web.Models.Portfolio>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Portfolio";
 }
 
 @* <h1>Index</h1>
@@ -50,40 +50,43 @@
             <div>
                 <h2>My portfolio</h2>
                 <p class="portfolio-networth h1 fw-bold">
-                    @{
-                        string portfolioNetWorthString = ViewBag.PortfolioNetWorth?.ToString();
-                        string formattedPortfolioNetWorth = "N/A";
-                        // Get the current rate from ViewBag
-                        string currentRateString = ViewBag.CurrentRate?.ToString();
+                    <span id="portfolio_networth_id">@{
+                            string portfolioNetWorthString = ViewBag.PortfolioNetWorth?.ToString();
+                            string formattedPortfolioNetWorth = "N/A";
+                            // Get the current rate from ViewBag
+                            string currentRateString = ViewBag.CurrentRate?.ToString();
 
-                        if (!string.IsNullOrWhiteSpace(portfolioNetWorthString) &&
-                        !string.IsNullOrWhiteSpace(currentRateString))
-                        {
-                            // Parse strings to decimal
-                            decimal portfolioNetWorth = decimal.Parse(portfolioNetWorthString);
-                            decimal currentRate = decimal.Parse(currentRateString,
-                            System.Globalization.CultureInfo.InvariantCulture);
+                            if (!string.IsNullOrWhiteSpace(portfolioNetWorthString) &&
+                            !string.IsNullOrWhiteSpace(currentRateString))
+                            {
+                                // Parse strings to decimal
+                                decimal portfolioNetWorth = decimal.Parse(portfolioNetWorthString);
+                                decimal currentRate = decimal.Parse(currentRateString,
+                                System.Globalization.CultureInfo.InvariantCulture);
 
-                            // Adjust portfolio net worth by the current rate
-                            decimal adjustedPortfolioNetWorth = portfolioNetWorth / currentRate;
+                                // Adjust portfolio net worth by the current rate
+                                decimal adjustedPortfolioNetWorth = portfolioNetWorth / currentRate;
 
-                            // Format to two decimal places with thousands separator
-                            formattedPortfolioNetWorth = adjustedPortfolioNetWorth.ToString("N2",
-                            System.Globalization.CultureInfo.InvariantCulture);
-                        }
+                                // Format to two decimal places with thousands separator
+                                formattedPortfolioNetWorth = adjustedPortfolioNetWorth.ToString("N2",
+                                System.Globalization.CultureInfo.InvariantCulture);
+                            }
 
-                        @formattedPortfolioNetWorth
-                        @ViewBag.CurrentSymbol
-                    }
+                            @formattedPortfolioNetWorth
+
+                        }</span>
+                    <span id="trimmed">@ViewBag.CurrentSymbol</span>
+                    <span id="yesterday_change"></span>
                 </p>
             </div>
-            <button class="portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
+            <button class="btn portfolio-add-button"><a asp-controller="Transakcija" asp-action="Create"
                     class="portfolio-add-button-link">+ Add transaction</a></button>
         </div>
-
-        <div class="d-flex" style="width: 45vw;">
-            <canvas id="myChart" width="400" height="400"></canvas>
-            <canvas id="myChart2" width="400" height="400"></canvas>
+        <br />
+        <br />
+        <div id="canvas_a">
+            <canvas id="myChart" width="600" height="300"></canvas>
+            <canvas id="myChart2" height="300"></canvas>
         </div>
 
         <table style="display: none;">
@@ -111,25 +114,25 @@
 
         <hr>
         <div class="d-flex">
-            <p class="portfolio-holdings-switcher me-5">Holdings</p>
+            <p class="portfolio-holdings-switcher me-5 active">Holdings</p>
             <p class="portfolio-transaction-switcher">Transactions</p>
         </div>
-        <table class="portfolio-transaction-history-tab w-100">
+        <table class="portfolio-transaction-history-tab w-100 table striped-table table-hover" id="transactions-table">
             <thead>
                 <tr>
-                    <th class="pe-5">Date</th>
-                    <th class="pe-5">Asset</th>
-                    <th class="pe-5">Price</th>
-                    <th class="pe-5">Quantity</th>
+                    <th class="pe-5 mainpage-table-name">Date</th>
+                    <th class="pe-5 mainpage-table-name">Asset</th>
+                    <th class="pe-5 mainpage-table-name">Price</th>
+                    <th class="pe-5 mainpage-table-name">Quantity</th>
                 </tr>
             </thead>
             <tbody id="podatki">
                 @foreach (var t in @ViewBag.transactions)
                 {
                     <tr>
-                        <td>@t.Date</td>
-                        <td>@t.Asset.Name</td>
-                        <td>
+                        <td class="mainpage-table-name">@t.Date</td>
+                        <td class="mainpage-table-name">@t.Asset.Name</td>
+                        <td class="mainpage-table-name">
                             @{
                                 string priceString = t.Price?.ToString();
                                 string formattedPrice = "N/A";
@@ -155,27 +158,27 @@
                                 @ViewBag.CurrentSymbol
                             }
                         </td>
-                        <td>@t.Quantity</td>
+                        <td class="mainpage-table-name">@t.Quantity</td>
                     </tr>
                 }
             </tbody>
         </table>
-        <table class="portfolio-overview-tab">
+        <table class="portfolio-overview-tab w-100 table striped-table table-hover" id="overview-table">
             <thead>
                 <tr>
-                    <th class="pe-5">Asset</th>
-                    <th class="pe-5">Price</th>
-                    <th class="pe-5">Holdings</th>
-                    <th class="pe-5">Average buy price</th>
-                    <th class="pe-5">Profit/Loss (ROI)</th>
+                    <th class="pe-5 mainpage-table-name">Asset</th>
+                    <th class="pe-5 mainpage-table-name">Price</th>
+                    <th class="pe-5 mainpage-table-name">Holdings</th>
+                    <th class="pe-5 mainpage-table-name">Average buy price</th>
+                    <th class="pe-5 mainpage-table-change">Profit/Loss (ROI)</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var t in @ViewBag.overview)
                 {
                     <tr>
-                        <td>@t.AssetName</td>
-                        <td>
+                        <td class="mainpage-table-name">@t.AssetName</td>
+                        <td class="mainpage-table-name">
                             @{
                                 string currentAssetPriceString = t.CurrentAssetPrice?.ToString();
                                 string formattedCurrentAssetPrice = "N/A";
@@ -203,8 +206,8 @@
                                 @ViewBag.CurrentSymbol
                             }
                         </td>
-                        <td>@t.TotalQuantity</td>
-                        <td>
+                        <td class="mainpage-table-name">@t.TotalQuantity</td>
+                        <td class="mainpage-table-name">
                             @{
                                 string averagePriceString = t.AveragePrice?.ToString();
                                 string formattedAveragePrice = "N/A";
@@ -230,14 +233,19 @@
                                 @ViewBag.CurrentSymbol
                             }
                         </td>
-                        <td>
-                            @if (t.ProfitLoss < 0)
-                            {
-                                <span style="color: red;">@t.ProfitLoss.ToString("P2")</span> <!-- Negative ROI -->
-                            }
-                            else
-                            {
-                                <span style="color: green;">@t.ProfitLoss.ToString("P2")</span> <!-- Positive ROI -->
+                        <td class="change mainpage-table-change">
+                            @{
+                                string changePercent24Hr = @t.ProfitLoss.ToString();
+                                string replacedString = changePercent24Hr.Replace(",", ".");
+                                string formattedchangePercent24Hr = "N/A";
+
+                                if (!string.IsNullOrWhiteSpace(replacedString) && replacedString.Contains("."))
+                                {
+                                    int dotIndex = replacedString.IndexOf(".");
+                                    formattedchangePercent24Hr = replacedString.Substring(0, dotIndex + 5);
+                                }
+
+                                @formattedchangePercent24Hr
                             }
                         </td>
                     </tr>
@@ -248,6 +256,26 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    for (let i = 0; i < document.getElementsByClassName('change').length; i++) {
+        value = document.getElementsByClassName('change')[i].innerHTML;
+        value = parseFloat(value);
+        if (value > 0) {
+            document.getElementsByClassName('change')[i].classList.toggle("up");
+            svg_up = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+  <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+</svg>`;
+            document.getElementsByClassName('change')[i].innerHTML = svg_up + ' ' + (value * 100) + "%";
+        }
+        else {
+            document.getElementsByClassName('change')[i].classList.toggle("down");
+            svg_down = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+        </svg>`;
+            document.getElementsByClassName('change')[i].innerHTML = svg_down + ' ' + (value * 100) + "%";
+        }
+    }
+
+
     // Tole je tudi good
     const holdingsSwitcher = document.querySelector('.portfolio-holdings-switcher');
     const transactionsSwitcher = document.querySelector('.portfolio-transaction-switcher');
@@ -719,7 +747,30 @@
     (async () => {
         const portfolioValues = await calculatePortfolioValuePerDay(podatki, days);
         yourFunction(portfolioValues);
-        console.log("Asset Allocation for Last Day:", portfolioValues.assetAllocation);
+        let vl = document.getElementById('yesterday_change').innerHTML;
+        let vl2 = document.getElementById('portfolio_networth_id').innerHTML;
+
+        let vcerajsnja_vrednost = portfolioValues.portfolioValues[portfolioValues.portfolioValues.length - 2];
+        console.log(vl2);
+        console.log(vcerajsnja_vrednost);
+        // Convert vl2 to a number
+        var vl2Number = parseFloat(vl2.replace(/,/g, ''));
+        console.log(vl2Number);
+        // Calculate the percentage difference
+        var procent = ((vl2Number - vcerajsnja_vrednost) / vcerajsnja_vrednost) * 100;
+        procent = procent.toFixed(2);
+        // Calculate the subtraction
+        var vrednost = vl2Number - vcerajsnja_vrednost;
+        vrednost = vrednost.toFixed(2);
+        // Output the results
+        console.log("Percentage Difference: " + procent + "%");
+        console.log("Subtraction Result: " + vrednost);
+        if (vrednost < 0) {
+            document.getElementById('yesterday_change').innerHTML = ", " + `<span class="down">` + vrednost + "$ (" + procent + "%)" + `</span>` + " in 24h";
+        }
+        else {
+            document.getElementById('yesterday_change').innerHTML = ",&nbsp" + `<span class="up">` + "+" + vrednost + "$ (" + procent + "%)" + `</span>` + "&nbspin 24h";
+        }
     })();
 
 
@@ -745,7 +796,7 @@
             type: 'line',
             data: data,
             options: {
-                responsive: true,
+                responsive: false,
                 maintainAspectRatio: false, // Allow resizing
                 plugins: {
                     legend: {
@@ -760,12 +811,26 @@
                         title: {
                             display: true,
                             text: 'Day'
+                        },
+                        ticks: {
+                            callback: function (value, index, values) {
+                                // Show only every second label
+                                return index % 2 === 0 ? this.getLabelForValue(value) : '';
+                            },
+                            color: '#f5acc6'
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Portfolio value (' + '@ViewBag.CurrentSymbol' + ')'
+                            text: 'Portfolio value (' + '@ViewBag.CurrentSymbol' + ')',
+                            color: '#f5acc6',
+                        },
+                        ticks: {
+                            color: '#f5acc6'
+                        },
+                        grid: {
+                            color: '#7d7577'
                         }
                     }
                 }
@@ -786,13 +851,27 @@
                 }]
             },
             options: {
-                responsive: true,
+                responsive: false,
                 maintainAspectRatio: false, // Allow resizing
                 plugins: {
                     legend: {
-                        display: true
-                    }
-                }
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            padding: 5 // Reduce space between legend items
+                        },
+                    },
+                    title: {
+                        display: true,   // Set to true to display the title
+                        text: 'Asset Allocation', // Title 
+                        font: {
+                            size: 18,  // Font size of the title
+                            weight: 'bold',  // Font weight of the title
+                            family: "monospace",
+                        },
+                        color: '#df4f90',
+                    },
+                },
             }
         });
     }
@@ -924,11 +1003,21 @@
             const partial_footerTheme = document.getElementById("partial_footer");
             const nav_linkTheme = document.getElementsByClassName("nav-link2");
             const navbar_gearTheme = document.getElementById("navbar_gear");
+            const table = document.getElementById("transactions-table");
+            const table2 = document.getElementById("overview-table");
             if (theme == "dark") {
                 navbar_gearTheme.setAttribute("fill", "#f5acc6");
+                table.classList.add("dark-theme");
+                table.classList.remove("light-theme");
+                table2.classList.add("dark-theme");
+                table2.classList.remove("light-theme");
             }
             else {
                 navbar_gearTheme.setAttribute("fill", "#392d31");
+                table.classList.add("light-theme");
+                table.classList.remove("dark-theme");
+                table2.classList.add("light-theme");
+                table2.classList.remove("dark-theme");
             }
             document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
             navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
@@ -950,4 +1039,9 @@
         // Start observing the hidden input for changes to the `value` attribute
         observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
     });
+
+    var spanElement = document.getElementById('trimmed');
+    if (spanElement) {
+        spanElement.textContent = spanElement.textContent.trim();
+    }
 </script>

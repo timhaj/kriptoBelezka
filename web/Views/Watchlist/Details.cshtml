@@ -5,16 +5,19 @@
 }
 
 <input type="hidden" id="saved-theme" value="@ViewBag.mode" />
-<h1>Details</h1>
-
-
 <div>
-    <h4>Watchlist</h4>
+    <h1><span id="watchlist_username">@ViewBag.username</span>'s Watchlist</h1>
+
+    <div>
+        <a asp-action="Index" id="watchlist_back_to_list">
+            < Back to List</a>
+    </div>
     <hr />
-    <form asp-action="Create" asp-controller="WatchlistAsset" method="post">
-        <div class="dropdown">
-            <div>
-                <input type="text" class="search-bar" id="searchInput" placeholder="Išči kripto žetone..."
+    <form asp-action="Create" asp-controller="WatchlistAsset" method="post"
+        class="d-flex flex-row justify-content-end align-items-center">
+        <div class="dropdown" id="watchlist_dropdown">
+            <div class="form-group">
+                <input type="text" class="search-bar" id="searchInput" placeholder="Search crypto tokens..."
                     onkeyup="filterOptions()">
 
                 <div class="options-list" id="cryptoSelect" name="AssetId" required>
@@ -24,36 +27,35 @@
                     }
                 </div>
             </div>
-            <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
-            <input type="hidden" name="AssetId" value="" />
-            <button id="watchlist-asset-adder" type="submit">Add asset</button>
+        </div>
+        <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
+        <input type="hidden" name="AssetId" value="" />
+        <button id="watchlist-asset-adder" class="btn" type="submit">Add asset</button>
     </form>
 </div>
-</div>
-
-<table class="table table-bordered">
+<br />
+<table class="table striped-table table-hover" id="watchlist-table">
     <thead>
         <tr>
-            <th>AssetId</th>
-            <th>Symbol</th>
-            <th>Price</th>
-            <th>Market Cap</th>
-            <th>Current Supply</th>
+            <th class="mainpage-table-name">Rank</th>
+            <th class="mainpage-table-name">Symbol</th>
+            <th>Price (@ViewBag.CurSymbol)</th>
+            <th>Market Cap (@ViewBag.CurSymbol)</th>
+            <th>Supply</th>
             <th>Max Supply</th>
-            <th>Change (24hr)</th>
+            <th class="mainpage-table-change">Change (24hr)</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var savedItem in Model.Saved)
         {
             <tr>
-                <td>@savedItem.Id</td>
-                <td>@savedItem.Name</td>
+                <td class="mainpage-table-name">@savedItem.Id</td>
+                <td class="mainpage-table-name">@savedItem.Name</td>
                 <td>
                     @{
                         string priceString = savedItem.Price.ToString();
                         string formattedPrice = "N/A";
-
                         // Get the current rate from ViewBag
                         string currentRateString = ViewBag.CurrentRate?.ToString();
 
@@ -61,22 +63,31 @@
                         {
                             // Parse strings to decimal
                             decimal price = decimal.Parse(priceString);
-                            Console.WriteLine(price);
                             decimal currentRate = decimal.Parse(currentRateString,
                             System.Globalization.CultureInfo.InvariantCulture);
 
                             // Adjust price by the current rate
                             decimal adjustedPrice = price / currentRate;
-
                             // Format to two decimal places
-                            formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                            if (adjustedPrice >= 0.1m)
+                            {
+                                formattedPrice = adjustedPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            else if (adjustedPrice > 0.01m && adjustedPrice < 0.1m)
+                            {
+                                formattedPrice = adjustedPrice.ToString("N5", System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                formattedPrice = adjustedPrice.ToString("N10", System.Globalization.CultureInfo.InvariantCulture);
+                            }
                         }
 
                         @formattedPrice
                         @ViewBag.CurrentSymbol
                     }
                 </td>
-                <td>
+                <td class="mcap">
                     @{
                         string marketCapString = savedItem.MarketCap.ToString();
                         string formattedMarketCap = "N/A";
@@ -100,23 +111,100 @@
                         @ViewBag.CurrentSymbol
                     }
                 </td>
-                <td>@savedItem.CurrentSupply</td>
-                <td>@savedItem.MaxSupply</td>
-                <td>@savedItem.ChangePercent24Hr</td>
+                <td class="supply">
+                    @{
+                        string supply = @savedItem.CurrentSupply.ToString();
+                        supply = supply.Replace(",", ".");
+                        string formattedSupply = "Invalid Supply";
+                        if (!string.IsNullOrWhiteSpace(supply) && supply.Contains("."))
+                        {
+                            int dotIndex = supply.IndexOf(".");
+                            formattedSupply = supply.Substring(0, dotIndex); // po potrebi
+                        }
+                        @formattedSupply
+                    }
+                </td>
+                <td class="msupply">
+                    @{
+                        string MaxSupply = @savedItem.MaxSupply.ToString();
+                        MaxSupply = MaxSupply.Replace(",", ".");
+                        string formattedMaxSupply = "N/A";
+                        if (!string.IsNullOrWhiteSpace(MaxSupply) && MaxSupply.Contains("."))
+                        {
+                            int dotIndex = MaxSupply.IndexOf(".");
+                            formattedMaxSupply = MaxSupply.Substring(0, dotIndex);
+                        }
+                        if (MaxSupply == "0.00")
+                        {
+                            formattedMaxSupply = "N/A";
+                        }
+                        @formattedMaxSupply
+                    }
+                </td>
+                <td class="change mainpage-table-change">@{
+                        string changePercent24Hr = @savedItem.ChangePercent24Hr.ToString();
+                        string replacedString = changePercent24Hr.Replace(",", ".");
+                        string formattedchangePercent24Hr = "N/A";
 
+                        if (!string.IsNullOrWhiteSpace(replacedString) && replacedString.Contains("."))
+                        {
+                            int dotIndex = replacedString.IndexOf(".");
+                            formattedchangePercent24Hr = replacedString.Substring(0, dotIndex + 3);
+                        }
+
+                        @formattedchangePercent24Hr
+                    }
+                </td>
             </tr>
         }
     </tbody>
 </table>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 
 
 <script>
+    let username = document.getElementById("watchlist_username");
+    username.innerHTML = username.innerHTML.substring(0, username.innerHTML.indexOf(String.fromCharCode(64)));
+
+    for (let i = 0; i < document.getElementsByClassName('supply').length; i++) {
+        value = document.getElementsByClassName('supply')[i].innerHTML;
+        value = BigInt(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        document.getElementsByClassName('supply')[i].innerHTML = value;
+    }
+
+    for (let i = 0; i < document.getElementsByClassName('msupply').length; i++) {
+        value = document.getElementsByClassName('msupply')[i].innerHTML;
+        value = value.replace(/\s+/g, '');
+        if (value == "N/A") {
+            document.getElementsByClassName('msupply')[i].innerHTML = value;
+        }
+        else {
+            value = BigInt(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            document.getElementsByClassName('msupply')[i].innerHTML = value;
+        }
+    }
+
+    for (let i = 0; i < document.getElementsByClassName('change').length; i++) {
+        value = document.getElementsByClassName('change')[i].innerHTML;
+        value = parseFloat(value);
+        if (value > 0) {
+            document.getElementsByClassName('change')[i].classList.toggle("up");
+            svg_up = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+  <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+</svg>`;
+            document.getElementsByClassName('change')[i].innerHTML = svg_up + ' ' + value + "%";
+        }
+        else {
+            document.getElementsByClassName('change')[i].classList.toggle("down");
+            svg_down = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+        </svg>`;
+            document.getElementsByClassName('change')[i].innerHTML = svg_down + ' ' + value + "%";
+        }
+    }
+
     function filterOptions() {
 
     }
@@ -198,11 +286,16 @@
                 const partial_footerTheme = document.getElementById("partial_footer");
                 const nav_linkTheme = document.getElementsByClassName("nav-link2");
                 const navbar_gearTheme = document.getElementById("navbar_gear");
+                const table = document.getElementById("watchlist-table");
                 if (theme == "dark") {
                     navbar_gearTheme.setAttribute("fill", "#f5acc6");
+                    table.classList.add("dark-theme");
+                    table.classList.remove("light-theme");
                 }
                 else {
                     navbar_gearTheme.setAttribute("fill", "#392d31");
+                    table.classList.add("light-theme");
+                    table.classList.remove("dark-theme");
                 }
                 document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
                 navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";

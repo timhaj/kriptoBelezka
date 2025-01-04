@@ -37,7 +37,11 @@ body {
   text-align: start;
 }
 
-#mainpage-table>tbody>tr>td {
+#mainpage-table>tbody>tr>td,
+#watchlists-table>tbody>tr>td,
+#watchlist-table>tbody>tr>td,
+#transactions-table>tbody>tr>td,
+#overview-table>tbody>tr>td {
   padding-top: 20px;
   padding-bottom: 20px;
 }
@@ -218,7 +222,9 @@ body.dark-mode {
 #nastavitve_save_button,
 #login-submit,
 #registerSubmit,
-#create_transaction_submit {
+#create_transaction_submit,
+#watchlist-asset-adder,
+.portfolio-add-button {
   background-color: #df4f90;
   color: white;
 }
@@ -226,7 +232,9 @@ body.dark-mode {
 #nastavitve_save_button:hover,
 #login-submit:hover,
 #registerSubmit:hover,
-#create_transaction_submit:hover {
+#create_transaction_submit:hover,
+#watchlist-asset-adder:hover,
+.portfolio-add-button:hover {
   color: #3f3f3f;
   background-color: #e5699d;
 }
@@ -340,10 +348,61 @@ input:checked~.slider::before {
 #forgot-password,
 #resend-confirmation,
 #register-a-new-user,
-#create_transaction_back_to_portfolio {
+#create_transaction_back_to_portfolio,
+.details_link,
+#watchlist_back_to_list {
   color: #e5699d;
 }
 
 label+input {
   margin-top: 5px;
+}
+
+#watchlist_back_to_list:link,
+#watchlist_back_to_list:visited {
+  text-decoration: none;
+}
+
+#watchlist_back_to_list:hover,
+#watchlist_back_to_list:active {
+  text-decoration: underline;
+}
+
+#watchlist_dropdown {
+  width: inherit;
+}
+
+.portfolio-holdings-switcher.active,
+.portfolio-transaction-switcher.active {
+  color: #d82f83;
+  border-bottom: 2px solid #df4f90;
+}
+
+.portfolio-holdings-switcher:hover,
+.portfolio-transaction-switcher:hover {
+  color: #d82f83;
+  cursor: pointer;
+}
+
+.portfolio-networth {
+  color: #df4f90;
+  display: flex;
+}
+
+/* #myChart {
+  margin-right: 25%;
+} */
+
+#canvas_a {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+#yesterday_change {
+  font-size: 14px;
+  display: flex;
+  align-items: end;
+  margin-bottom: 10px;
 }

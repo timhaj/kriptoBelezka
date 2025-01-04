@@ -95,9 +95,8 @@ namespace web.Controllers
                             var response = await client.GetStringAsync(ratesAPI);
                             var apiResultRates = JsonConvert.DeserializeObject<ApiResponse2>(response);
                             var matchingRate = apiResultRates?.Data.FirstOrDefault(rate => rate.Id.Equals(nastavitve.CurrentCurrencySelected, StringComparison.OrdinalIgnoreCase));
-                            Console.WriteLine(matchingRate.RateUsd);
                             ViewBag.CurrentRate = matchingRate.RateUsd;
-                            ViewBag.CurrentSymbol = matchingRate.CurrencySymbol;
+                            ViewBag.CurrentSymbol = matchingRate.CurrencySymbol.Trim();
                             ViewBag.CurSymbol = matchingRate.Symbol;
                         }
                         catch (Exception ex)
@@ -105,7 +104,6 @@ namespace web.Controllers
                             ViewBag.Error = $"An error occurred: {ex.Message}";
                         }
                     }
-                    Console.WriteLine(nastavitve.CurrentCurrencySelected);
                 }
                 else
                 {
