@@ -763,8 +763,6 @@
         var vrednost = vl2Number - vcerajsnja_vrednost;
         vrednost = vrednost.toFixed(2);
         // Output the results
-        console.log("Percentage Difference: " + procent + "%");
-        console.log("Subtraction Result: " + vrednost);
         if (vrednost < 0) {
             document.getElementById('yesterday_change').innerHTML = ", " + `<span class="down">` + vrednost + "$ (" + procent + "%)" + `</span>` + " in 24h";
         }
