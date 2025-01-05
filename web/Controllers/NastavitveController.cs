@@ -90,6 +90,7 @@ namespace web.Controllers
                         {
                             return NotFound();
                         } */
+
             var currentUser = await _usermanager.GetUserAsync(User);
             var nastavitve = await _context.Nastavitves.FirstOrDefaultAsync(n => n.OwnerId == currentUser);
 
@@ -99,7 +100,7 @@ namespace web.Controllers
                 {
                     OwnerId = currentUser, // Assign the current user's ID
                     IsDarkMode = false,       // Default value
-                    CurrentCurrencySelected = "USD" // Default value
+                    CurrentCurrencySelected = "united-states-dollar" // Default value
                 };
 
                 _context.Nastavitves.Add(nastavitve);
@@ -108,7 +109,6 @@ namespace web.Controllers
             else
             {
                 ViewBag.SavedCurrency = nastavitve;
-                Console.WriteLine(ViewBag.SavedCurrency.CurrentCurrencySelected);
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             if (currentUser != null)

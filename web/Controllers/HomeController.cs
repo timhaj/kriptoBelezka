@@ -27,7 +27,9 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
+
         var currentUser = await _usermanager.GetUserAsync(User);
+
         if (currentUser != null)
         {
             var nastavitve = await _context.Nastavitves
@@ -41,7 +43,6 @@ public class HomeController : Controller
             {
                 ViewBag.mode = "light";
             }
-
             if (nastavitve != null)
             {
                 string ratesAPI = "https://api.coincap.io/v2/rates";
@@ -51,11 +52,13 @@ public class HomeController : Controller
                     {
                         var response = await client.GetStringAsync(ratesAPI);
                         var apiResultRates = JsonConvert.DeserializeObject<ApiResponse2>(response);
+
                         var matchingRate = apiResultRates?.Data.FirstOrDefault(rate => rate.Id.Equals(nastavitve.CurrentCurrencySelected, StringComparison.OrdinalIgnoreCase));
-                        //Console.WriteLine(matchingRate.RateUsd);
+                        //Console.WriteLine(matchingRate);
                         ViewBag.CurrentRate = matchingRate.RateUsd;
                         ViewBag.CurrentSymbol = matchingRate.CurrencySymbol;
                         ViewBag.CurSymbol = matchingRate.Symbol;
+                        //Console.WriteLine(apiResultRates);
                     }
                     catch (Exception ex)
                     {
@@ -67,6 +70,9 @@ public class HomeController : Controller
             else
             {
                 ViewBag.CurrentRate = 1;
+                ViewBag.CurrentSymbol = "$";
+                ViewBag.CurSymbol = "USD";
+                ViewBag.mode = "light";
             }
         }
         else
@@ -74,6 +80,7 @@ public class HomeController : Controller
             ViewBag.CurrentRate = 1;
             ViewBag.CurrentSymbol = "$";
             ViewBag.CurSymbol = "USD";
+            ViewBag.mode = "light";
         }
 
         string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
