@@ -62,12 +62,18 @@ namespace web.Controllers
                     .Select(g => g.Sum(t => (decimal)t.Quantity * (decimal)t.Asset.Price)) // Calculate total value for each asset
                     .Sum(); // Sum up the total values of all assets
                 ViewBag.PortfolioNetWorth = portfolioNetWorth;
-
+                ViewBag.lastTransaction = DateTime.Now.AddDays(-1);
                 foreach (var t in saved)
                 {//dobimo zadnji transaction
                     ViewBag.lastTransaction = t;
                 }
-
+            }
+            else
+            {
+                ViewBag.PortfolioNetWorth = -1;
+                ViewBag.lastTransaction = DateTime.Now.AddDays(-1);
+                ViewBag.overview = null;
+                ViewBag.transactions = null;
             }
 
             //user id
@@ -108,7 +114,17 @@ namespace web.Controllers
                 else
                 {
                     ViewBag.CurrentRate = 1;
+                    ViewBag.CurrentSymbol = "$";
+                    ViewBag.CurSymbol = "USD";
+                    ViewBag.mode = "light";
                 }
+            }
+            else
+            {
+                ViewBag.CurrentRate = 1;
+                ViewBag.CurrentSymbol = "$";
+                ViewBag.CurSymbol = "USD";
+                ViewBag.mode = "light";
             }
             return View(portfolios ?? new List<Portfolio>());
         }

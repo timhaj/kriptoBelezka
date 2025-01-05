@@ -55,6 +55,13 @@ namespace web.Controllers
                     ViewBag.mode = "light";
                 }
             }
+            else
+            {
+                ViewBag.CurrentRate = 1;
+                ViewBag.CurrentSymbol = "$";
+                ViewBag.CurSymbol = "USD";
+                ViewBag.mode = "light";
+            }
             string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
 
             using (HttpClient client = new HttpClient())
@@ -204,7 +211,17 @@ namespace web.Controllers
                 else
                 {
                     ViewBag.CurrentRate = 1;
+                    ViewBag.CurrentSymbol = "$";
+                    ViewBag.CurSymbol = "USD";
+                    ViewBag.mode = "light";
                 }
+            }
+            else
+            {
+                ViewBag.CurrentRate = 1;
+                ViewBag.CurrentSymbol = "$";
+                ViewBag.CurSymbol = "USD";
+                ViewBag.mode = "light";
             }
 
             // Pošlji ViewModel na pogled
