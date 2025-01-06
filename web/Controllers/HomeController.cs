@@ -83,7 +83,7 @@ public class HomeController : Controller
             ViewBag.mode = "light";
         }
 
-        string apiUrl = "https://api.coincap.io/v2/assets?limit=100";
+        string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
 
         using (HttpClient client = new HttpClient())
         {

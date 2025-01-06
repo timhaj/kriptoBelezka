@@ -454,3 +454,25 @@ label+input {
 .ordertype {
   font-weight: bolder;
 }
+
+.page-link.dark-mode {
+  background-color: #3f3f3f;
+  color: #f5acc6;
+}
+
+.page-link.light-mode {
+  background-color: white;
+  color: #df4f90;
+}
+
+.page-link.active {
+  background-color: #e5699d;
+  color: #24181c;
+  border: 1px solid #eb80ab;
+}
+
+.page-link:hover {
+  cursor: pointer;
+  color: #282828;
+  background-color: #f096b8;
+}

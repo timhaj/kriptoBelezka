@@ -98,7 +98,6 @@ namespace web.Controllers
                 // Shrani vse spremembe
                 await _context.BulkUpdateAsync(assetsToUpdate);
                 await _context.BulkInsertAsync(assetsToAdd);
-                Console.WriteLine("i was here");
             }
 
             var belezkaContext = _context.Watchlists.Include(w => w.OwnerId);
