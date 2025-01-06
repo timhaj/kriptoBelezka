@@ -105,6 +105,7 @@ namespace web.Controllers
 
                 _context.Nastavitves.Add(nastavitve);
                 await _context.SaveChangesAsync();
+                ViewBag.SavedCurrency = nastavitve;
             }
             else
             {

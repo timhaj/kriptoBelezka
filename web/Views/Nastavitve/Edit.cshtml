@@ -143,4 +143,6 @@
         // Start observing the hidden input for changes to the `value` attribute
         observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
     });
+    var checkbox = document.getElementById("switcher_input");
+    checkbox.checked = !checkbox.checked;
 </script>

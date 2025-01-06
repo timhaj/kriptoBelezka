@@ -224,7 +224,8 @@ body.dark-mode {
 #registerSubmit,
 #create_transaction_submit,
 #watchlist-asset-adder,
-.portfolio-add-button {
+.portfolio-add-button,
+#portfolio_create_button {
   background-color: #df4f90;
   color: white;
 }
@@ -234,7 +235,8 @@ body.dark-mode {
 #registerSubmit:hover,
 #create_transaction_submit:hover,
 #watchlist-asset-adder:hover,
-.portfolio-add-button:hover {
+.portfolio-add-button:hover,
+#portfolio_create_button:hover {
   color: #3f3f3f;
   background-color: #e5699d;
 }
