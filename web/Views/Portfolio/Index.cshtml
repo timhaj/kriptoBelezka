@@ -144,6 +144,7 @@
                     <th class="order pe-5 mainpage-table-name">Asset</th>
                     <th class="order pe-5 mainpage-table-name">Price</th>
                     <th class="order pe-5 mainpage-table-name">Quantity</th>
+                    <th class="order pe-5 mainpage-table-name">Order Type</th>
                 </tr>
             </thead>
             <tbody id="podatki">
@@ -185,6 +186,20 @@
                                     }
                                 </td>
                                 <td class="mainpage-table-name">@t.Quantity</td>
+                                <td class="mainpage-table-name">
+                                    @{
+                                        string buy = "BUY";
+                                        string sell = "SELL";
+                                        if (t.Quantity < 0)
+                                        {
+                                            <span class="down ordertype"> @sell </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="up ordertype"> @buy </span>
+                                        }
+                                    }
+                                </td>
                             </tr>
                         }
                     }
@@ -614,6 +629,13 @@
         let foo2 = stuff.portfolioValues.slice(0, -1);
         const assetNames = Object.keys(stuff.assetAllocation);
         const assetPercentages = Object.values(stuff.assetAllocation);
+        const filteredIndices = assetPercentages
+            .map((percentage, index) => ({ percentage, index }))
+            .filter(item => item.percentage !== 0)
+            .map(item => item.index);
+        const filteredAssetNames = filteredIndices.map(index => assetNames[index]);
+        const filteredAssetPercentages = filteredIndices.map(index => assetPercentages[index]);
+
         const data = {
             labels: foo, // X AXIS
             datasets: [{
@@ -679,9 +701,9 @@
         new Chart(ctx2, {
             type: 'pie',
             data: {
-                labels: assetNames,
+                labels: filteredAssetNames,
                 datasets: [{
-                    data: assetPercentages,
+                    data: filteredAssetPercentages,
                     backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], // Customize colors
                 }]
             },
@@ -710,124 +732,6 @@
             }
         });
     }
-
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-
-
-
-
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE        
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
 
     var spanElement = document.getElementById('trimmed');
     if (spanElement) {

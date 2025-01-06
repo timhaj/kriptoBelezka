@@ -51,8 +51,9 @@ namespace web.Controllers
                     TotalQuantity = g.Sum(t => t.Quantity), // Sum of quantities for this asset
                     AveragePrice = g.Average(t => t.Price), // Average price for this asset
                     CurrentAssetPrice = g.First().Asset.Price,
-                    ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price)) - 1
+                    ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price) + 0.01m) - 1
                 })
+                .Where(g => g.TotalQuantity > 0)
                 .ToList();
                 ViewBag.overview = transactionOverview;
                 //total portfolio networth
