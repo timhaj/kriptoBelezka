@@ -224,7 +224,8 @@ body.dark-mode {
 #registerSubmit,
 #create_transaction_submit,
 #watchlist-asset-adder,
-.portfolio-add-button {
+.portfolio-add-button,
+#portfolio_create_button {
   background-color: #df4f90;
   color: white;
 }
@@ -234,7 +235,8 @@ body.dark-mode {
 #registerSubmit:hover,
 #create_transaction_submit:hover,
 #watchlist-asset-adder:hover,
-.portfolio-add-button:hover {
+.portfolio-add-button:hover,
+#portfolio_create_button:hover {
   color: #3f3f3f;
   background-color: #e5699d;
 }
@@ -405,4 +407,72 @@ label+input {
   display: flex;
   align-items: end;
   margin-bottom: 10px;
+}
+
+.btn-buy,
+.btn-buy.active {
+  background-color: #98d831;
+  color: white;
+}
+
+.btn-sell,
+.btn-sell.active {
+  background-color: #f03a47;
+  color: white;
+}
+
+.btn-buy:hover {
+  background-color: #b2e167;
+  color: #3f3f3f;
+}
+
+.btn-sell:hover {
+  background-color: #fa706c;
+  color: #3f3f3f;
+}
+
+.btn-buy.inactive,
+.btn-sell.inactive {
+  background-color: white;
+  color: #3f3f3f;
+}
+
+.btn-buy.inactive {
+  border: 1px solid #98d831;
+}
+
+.btn-sell.inactive {
+  border: 1px solid #f03a47;
+}
+
+.btn-buy,
+.btn-sell {
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.ordertype {
+  font-weight: bolder;
+}
+
+.page-link.dark-mode {
+  background-color: #3f3f3f;
+  color: #f5acc6;
+}
+
+.page-link.light-mode {
+  background-color: white;
+  color: #df4f90;
+}
+
+.page-link.active {
+  background-color: #e5699d;
+  color: #24181c;
+  border: 1px solid #eb80ab;
+}
+
+.page-link:hover {
+  cursor: pointer;
+  color: #282828;
+  background-color: #f096b8;
 }

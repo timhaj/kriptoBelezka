@@ -12,6 +12,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" name="PortfolioId" value="@ViewBag.PortId.Id">
             <input type="hidden" name="AssetId" value="" />
+            <input type="hidden" name="OrderType" id="orderType" value="">
             @*             <div class="form-group">
                 <label asp-for="PortfolioId" class="control-label"></label>
                 <select asp-for="PortfolioId" class="form-control" asp-items="ViewBag.PortfolioId"></select>
@@ -31,12 +32,19 @@
                     </div>
                 </div>
             </div>
-
+            <br />
+            <div class="btn-group" role="group" aria-label="Buy and Sell">
+                <button type="button" id="buyButton" class="btn btn-buy"
+                    onclick="toggleActive('buyButton', 'sellButton', 'Buy')">Buy</button>
+                <button type="button" id="sellButton" class="btn btn-sell"
+                    onclick="toggleActive('sellButton', 'buyButton', 'Sell')">Sell</button>
+            </div>
             @*             <div class="form-group">
                 <label asp-for="AssetId" class="control-label"></label>
                 <select asp-for="AssetId" class="form-control" asp-items="ViewBag.AssetId"></select>
             </div> *@
-            <br>
+            <br />
+            <br />
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
                 <input asp-for="Quantity" class="form-control" />
@@ -174,4 +182,12 @@
             // Start observing the hidden input for changes to the `value` attribute
             observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
         });
+
+    function toggleActive(activeId, inactiveId, actionValue) {
+        document.getElementById(activeId).classList.add('active');
+        document.getElementById(activeId).classList.remove('inactive');
+        document.getElementById(inactiveId).classList.remove('active');
+        document.getElementById(inactiveId).classList.add('inactive');
+        document.getElementById('orderType').value = actionValue;
+    }
 </script>

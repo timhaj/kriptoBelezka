@@ -37,13 +37,13 @@
 <table class="table striped-table table-hover" id="watchlist-table">
     <thead>
         <tr>
-            <th class="mainpage-table-name">Rank</th>
-            <th class="mainpage-table-name">Symbol</th>
-            <th>Price (@ViewBag.CurSymbol)</th>
-            <th>Market Cap (@ViewBag.CurSymbol)</th>
+            <th class="order mainpage-table-name">Rank</th>
+            <th class="order mainpage-table-name">Symbol</th>
+            <th class="order">Price (@ViewBag.CurSymbol)</th>
+            <th class="order">Market Cap (@ViewBag.CurSymbol)</th>
             <th>Supply</th>
             <th>Max Supply</th>
-            <th class="mainpage-table-change">Change (24hr)</th>
+            <th class="order mainpage-table-change">Change (24hr)</th>
         </tr>
     </thead>
     <tbody>
@@ -317,6 +317,66 @@
             // Start observing the hidden input for changes to the `value` attribute
             observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
         });
+
+    function table_sort() {
+        const styleSheet = document.createElement('style');
+        styleSheet.innerHTML = `
+        .order-inactive span {
+            visibility:hidden;
+        }
+        .order-inactive:hover span {
+            visibility:visible;
+        }
+        .order-active span {
+            visibility: visible;
+        }
+    `;
+        document.head.appendChild(styleSheet);
+        console.log("test");
+        document.querySelectorAll('th.order').forEach(th_elem => {
+            let asc = true;
+            const span_elem = document.createElement('span');
+            span_elem.style = "font-size:0.8rem; margin-left:0.5rem";
+            span_elem.innerHTML = "▼";
+            th_elem.appendChild(span_elem);
+            th_elem.classList.add('order-inactive');
+
+            const index = Array.from(th_elem.parentNode.children).indexOf(th_elem);
+            th_elem.addEventListener('click', (e) => {
+                document.querySelectorAll('th.order').forEach(elem => {
+                    elem.classList.remove('order-active')
+                    elem.classList.add('order-inactive')
+                });
+                th_elem.classList.remove('order-inactive');
+                th_elem.classList.add('order-active');
+
+                if (!asc) {
+                    th_elem.querySelector('span').innerHTML = '▲';
+                } else {
+                    th_elem.querySelector('span').innerHTML = '▼';
+                }
+                const arr = Array.from(th_elem.closest("table").querySelectorAll('tbody tr'));
+                arr.sort((a, b) => {
+                    let a_val = a.children[index].innerText.replace(/[\$,]/g, '');
+                    let b_val = b.children[index].innerText.replace(/[\$,]/g, '');
+                    const a_num = parseFloat(a_val);
+                    const b_num = parseFloat(b_val);
+
+                    // Check if both values are valid numbers
+                    if (!isNaN(a_num) && !isNaN(b_num)) {
+                        return asc ? a_num - b_num : b_num - a_num;
+                    }
+                    return (asc) ? a_val.localeCompare(b_val) : b_val.localeCompare(a_val);
+                })
+                arr.forEach(elem => {
+                    th_elem.closest("table").querySelector("tbody").appendChild(elem)
+                });
+                asc = !asc;
+            })
+        })
+    }
+
+    table_sort();
 </script>
 
 

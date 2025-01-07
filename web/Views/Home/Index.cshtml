@@ -7,17 +7,18 @@
     <h2 style="text-align: left; font-family: monospace;margin-bottom: 20px;">
         Realtime Cryptocurrency Prices by Market Cap
     </h2>
-    <table data-show-multi-sort class="table striped-table table-hover align-middle" id="mainpage-table">
+    <table data-show-multi-sort class="table striped-table table-hover align-middle" id="mainpage-table"
+        style="display: none;">
         <thead>
             <tr>
-                <th>Rank</th>
-                <th class="mainpage-table-name">Name</th>
-                <th>Price (@ViewBag.CurSymbol)</th>
+                <th class="order">Rank</th>
+                <th class="order mainpage-table-name">Name</th>
+                <th class="order">Price (@ViewBag.CurSymbol)</th>
                 <th>Supply</th>
                 <th>Max Supply</th>
-                <th>Market Cap (@ViewBag.CurSymbol)</th>
-                <th>24Hr Volume (@ViewBag.CurSymbol)</th>
-                <th class="mainpage-table-change">Change 24Hr (%)</th>
+                <th class="order">Market Cap (@ViewBag.CurSymbol)</th>
+                <th class="order">24Hr Volume (@ViewBag.CurSymbol)</th>
+                <th class="order mainpage-table-change">Change 24Hr (%)</th>
             </tr>
         </thead>
         <tbody>
@@ -155,6 +156,50 @@
             }
         </tbody>
     </table>
+
+    <table id="backup-table" style="display: none;">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Supply</th>
+                <th>Max Supply</th>
+                <th>Market Cap</th>
+                <th>Volume</th>
+                <th>24Change</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+    <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+        <ul class="pagination" id="pagination-container">
+            <li class="page-item">
+                <p class="page-link active" onclick="changePage(1)">1</p>
+            </li>
+            <li class="page-item">
+                <p class="page-link" onclick="changePage(2)">2</p>
+            </li>
+            <li class="page-item">
+                <p class="page-link" onclick="changePage(3)">3</p>
+            </li>
+            <li class="page-item">
+                <p class="page-link" onclick="changePage(4)">4</p>
+            </li>
+            <li class="page-item">
+                <p class="page-link" onclick="changePage(5)">5</p>
+            </li>
+            <li class="page-item">
+                <p class="page-link" aria-label="Next" onclick="changePage(currentPage + 1)">
+                    <span aria-hidden="true">&gt;</span>
+                </p>
+            </li>
+        </ul>
+    </nav>
+
 </div>
 
 <script>
@@ -207,6 +252,226 @@
         }
     }
 
+    @*     setInterval(() => {
+        location.reload();
+    }, 60000); *@
+
+        function table_sort() {
+            const styleSheet = document.createElement('style');
+            styleSheet.innerHTML = `
+        .order-inactive span {
+            visibility:hidden;
+        }
+        .order-inactive:hover span {
+            visibility:visible;
+        }
+        .order-active span {
+            visibility: visible;
+        }
+    `;
+            document.head.appendChild(styleSheet);
+            document.querySelectorAll('th.order').forEach(th_elem => {
+                let asc = true;
+                const span_elem = document.createElement('span');
+                span_elem.style = "font-size:0.8rem; margin-left:0.5rem";
+                span_elem.innerHTML = "▼";
+                th_elem.appendChild(span_elem);
+                th_elem.classList.add('order-inactive');
+
+                const index = Array.from(th_elem.parentNode.children).indexOf(th_elem);
+                th_elem.addEventListener('click', (e) => {
+                    document.querySelectorAll('th.order').forEach(elem => {
+                        elem.classList.remove('order-active')
+                        elem.classList.add('order-inactive')
+                    });
+                    th_elem.classList.remove('order-inactive');
+                    th_elem.classList.add('order-active');
+
+                    if (!asc) {
+                        th_elem.querySelector('span').innerHTML = '▲';
+                    } else {
+                        th_elem.querySelector('span').innerHTML = '▼';
+                    }
+                    const arr = Array.from(th_elem.closest("table").querySelectorAll('tbody tr'));
+                    arr.sort((a, b) => {
+                        let a_val = a.children[index].innerText.replace(/[\$,]/g, '');
+                        let b_val = b.children[index].innerText.replace(/[\$,]/g, '');
+                        const a_num = parseFloat(a_val);
+                        const b_num = parseFloat(b_val);
+
+                        // Check if both values are valid numbers
+                        if (!isNaN(a_num) && !isNaN(b_num)) {
+                            return asc ? a_num - b_num : b_num - a_num;
+                        }
+                        return (asc) ? a_val.localeCompare(b_val) : b_val.localeCompare(a_val);
+                    })
+                    arr.forEach(elem => {
+                        th_elem.closest("table").querySelector("tbody").appendChild(elem)
+                    });
+                    asc = !asc;
+                })
+            })
+        }
+
+    table_sort();
+
+    const totalAssets = 2000;
+    const assetsPerPage = 100;
+    let currentPage = 1;
+
+    function displayPage(page) {
+        const backupTableBody = document.querySelector("#backup-table tbody");
+        const rows = backupTableBody.querySelectorAll("tr");
+
+        let podatek = Array.from(rows).map(row => {
+            const cells = row.querySelectorAll("td");
+            return {
+                Rank: cells[0].innerHTML,
+                Name: cells[1].innerHTML,
+                Price: cells[2].innerHTML,
+                Supply: cells[3].innerHTML,
+                MSupply: cells[4].innerHTML,
+                MCap: cells[5].innerHTML,
+                Volume: cells[6].innerHTML,
+                Change: cells[7].textContent.trim().replace('%', ''),
+            };
+        });
+
+        const start = (page - 1) * assetsPerPage;
+        const end = start + assetsPerPage;
+        const pageAssets = podatek.slice(start, end);
+
+        const tableBody = document.querySelector("#mainpage-table tbody");
+        tableBody.innerHTML = "";
+
+        pageAssets.forEach(podatki => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+        <td>${podatki.Rank}</td>
+        <td class="mainpage-table-name">${podatki.Name}</td>
+        <td>${podatki.Price}</td>
+        <td>${podatki.Supply}</td>
+        <td>${podatki.MSupply}</td>
+        <td>${podatki.MCap}</td>
+        <td>${podatki.Volume}</td>
+        <td class="change mainpage-table-change">${podatki.Change}</td>
+      `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function cloneDataToBackup() {
+        const mainTableBody = document.querySelector("#mainpage-table tbody");
+        const backupTableBody = document.querySelector("#backup-table tbody");
+
+        backupTableBody.innerHTML = mainTableBody.innerHTML;
+    }
+
+    function updatePagination(startPage) {
+        const paginationContainer = document.querySelector("#pagination-container");
+        paginationContainer.innerHTML = "";
+
+        const maxPages = Math.ceil(totalAssets / assetsPerPage);
+        const endPage = Math.min(startPage + 4, maxPages);
+        const pageNumbers = [];
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(i);
+        }
+
+        if (startPage > 1) {
+            const prevPage = document.createElement("li");
+            prevPage.classList.add("page-item");
+            prevPage.innerHTML = `<p class="page-link" onclick="changePage(${startPage - 1})">&lt;</p>`;
+            paginationContainer.appendChild(prevPage);
+        }
+
+        let karJeOstal = [];
+
+        pageNumbers.forEach(page => {
+            if (page >= 1) {
+                const pageItem = document.createElement("li");
+                pageItem.classList.add("page-item");
+                if (page === currentPage) {
+                    pageItem.innerHTML = `<p class="page-link active" onclick="changePage(${page})">${page}</p>`;
+                }
+                else {
+                    pageItem.innerHTML = `<p class="page-link" onclick="changePage(${page})">${page}</p>`;
+                }
+                paginationContainer.appendChild(pageItem);
+            }
+            else {
+                if (karJeOstal.length == 0) {
+                    karJeOstal.push(pageNumbers[pageNumbers.length - 1] + 1);
+                }
+                else {
+                    karJeOstal.push(karJeOstal[karJeOstal.length - 1] + 1);
+                }
+            }
+        });
+
+        karJeOstal.forEach(page => {
+            const pageItem = document.createElement("li");
+            pageItem.classList.add("page-item");
+            if (page === currentPage) {
+                pageItem.innerHTML = `<p class="page-link active" onclick="changePage(${page})">${page}</p>`;
+            }
+            else {
+                pageItem.innerHTML = `<p class="page-link" onclick="changePage(${page})">${page}</p>`;
+            }
+            paginationContainer.appendChild(pageItem);
+        });
+
+        if (endPage < maxPages) {
+            const nextPage = document.createElement("li");
+            nextPage.classList.add("page-item");
+            nextPage.innerHTML = `<p class="page-link" onclick="changePage(${startPage + 5})">&gt;</p>`;
+            paginationContainer.appendChild(nextPage);
+        }
+
+        for (let i = 0; i < 100; i++) {
+            value = document.getElementsByClassName('change')[i].innerHTML;
+            value = parseFloat(value);
+            if (value > 0) {
+                document.getElementsByClassName('change')[i].classList.toggle("up");
+                svg_up = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+  <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+</svg>`;
+                document.getElementsByClassName('change')[i].innerHTML = svg_up + ' ' + value + "%";
+            }
+            else {
+                document.getElementsByClassName('change')[i].classList.toggle("down");
+                svg_down = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+        </svg>`;
+                document.getElementsByClassName('change')[i].innerHTML = svg_down + ' ' + value + "%";
+            }
+        }
+        const savedThemeInput = document.getElementById("saved-theme");
+        let theme = savedThemeInput.value;
+        const paginationTheme = document.getElementsByClassName("page-link");
+        for (let i = 0; i < paginationTheme.length; i++) {
+            paginationTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+        }
+    }
+
+    function changePage(newPage) {
+        if (newPage < 1 || newPage > Math.ceil(totalAssets / assetsPerPage)) return;
+        currentPage = newPage;
+        displayPage(currentPage);
+        updatePagination(newPage - 2);
+    }
+
+    cloneDataToBackup();
+    displayPage(currentPage);
+    updatePagination(1);
+    const savedThemeInput = document.getElementById("saved-theme");
+    let theme = savedThemeInput.value;
+    const paginationTheme = document.getElementsByClassName("page-link");
+    for (let i = 0; i < paginationTheme.length; i++) {
+        paginationTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         const savedThemeInput = document.getElementById("saved-theme");
 
@@ -216,6 +481,7 @@
             const navbar_titleTheme = document.getElementById("navbar_title");
             const partial_footerTheme = document.getElementById("partial_footer");
             const nav_linkTheme = document.getElementsByClassName("nav-link2");
+            const paginationTheme = document.getElementsByClassName("page-link");
             const navbar_gearTheme = document.getElementById("navbar_gear");
             const table = document.getElementById("mainpage-table");
             if (theme == "dark") {
@@ -235,6 +501,9 @@
             for (let i = 0; i < nav_linkTheme.length; i++) {
                 nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
             }
+            for (let i = 0; i < paginationTheme.length; i++) {
+                paginationTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            }
         };
 
         // Initialize theme on page load
@@ -249,7 +518,8 @@
         observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
     });
 
-    setInterval(() => {
-        location.reload();
-    }, 60000);
+    function showMainTable() {
+        document.querySelector("#mainpage-table").style.display = "table";
+    }
+    showMainTable();
 </script>

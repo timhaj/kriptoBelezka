@@ -85,7 +85,21 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PortfolioId,AssetId,Quantity,Date,Price")] Transakcija transakcija)
         {
-            Console.WriteLine(Request.Form);
+            Console.WriteLine(Request.Form["OrderType"]);
+            string orderType = Request.Form["OrderType"].ToString();
+            if (orderType == "Buy")
+            {
+                transakcija.Quantity = transakcija.Quantity;
+            }
+            else if (orderType == "Sell")
+            {
+                transakcija.Quantity = -transakcija.Quantity;
+            }
+            else
+            {
+                transakcija.Quantity = transakcija.Quantity;
+            }
+            Console.WriteLine(transakcija.Quantity);
             if (ModelState.IsValid)
             {
                 _context.Add(transakcija);

@@ -48,7 +48,7 @@
         <p>You have not yet created a portfolio.</p>
         <form asp-action="Create">
             <input type="hidden" name="OwnerId" value="@ViewBag.UserId" />
-            <input type="submit" value="Create" class="btn btn-primary" />
+            <input type="submit" value="Create" class="btn" id="portfolio_create_button" />
         </form>
     }
     else
@@ -140,10 +140,11 @@
         <table class="portfolio-transaction-history-tab w-100 table striped-table table-hover" id="transactions-table">
             <thead>
                 <tr>
-                    <th class="pe-5 mainpage-table-name">Date</th>
-                    <th class="pe-5 mainpage-table-name">Asset</th>
-                    <th class="pe-5 mainpage-table-name">Price</th>
-                    <th class="pe-5 mainpage-table-name">Quantity</th>
+                    <th class="order pe-5 mainpage-table-name">Date</th>
+                    <th class="order pe-5 mainpage-table-name">Asset</th>
+                    <th class="order pe-5 mainpage-table-name">Price</th>
+                    <th class="order pe-5 mainpage-table-name">Quantity</th>
+                    <th class="order pe-5 mainpage-table-name">Order Type</th>
                 </tr>
             </thead>
             <tbody id="podatki">
@@ -185,6 +186,20 @@
                                     }
                                 </td>
                                 <td class="mainpage-table-name">@t.Quantity</td>
+                                <td class="mainpage-table-name">
+                                    @{
+                                        string buy = "BUY";
+                                        string sell = "SELL";
+                                        if (t.Quantity < 0)
+                                        {
+                                            <span class="down ordertype"> @sell </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="up ordertype"> @buy </span>
+                                        }
+                                    }
+                                </td>
                             </tr>
                         }
                     }
@@ -194,11 +209,11 @@
         <table class="portfolio-overview-tab w-100 table striped-table table-hover" id="overview-table">
             <thead>
                 <tr>
-                    <th class="pe-5 mainpage-table-name">Asset</th>
-                    <th class="pe-5 mainpage-table-name">Price</th>
-                    <th class="pe-5 mainpage-table-name">Holdings</th>
-                    <th class="pe-5 mainpage-table-name">Average buy price</th>
-                    <th class="pe-5 mainpage-table-change">Profit/Loss (ROI)</th>
+                    <th class="order pe-5 mainpage-table-name">Asset</th>
+                    <th class="order pe-5 mainpage-table-name">Price</th>
+                    <th class="order pe-5 mainpage-table-name">Holdings</th>
+                    <th class="order pe-5 mainpage-table-name">Average buy price</th>
+                    <th class="order pe-5 mainpage-table-change">Profit/Loss (ROI)</th>
                 </tr>
             </thead>
             <tbody>
@@ -294,9 +309,63 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            const navbarTheme = document.getElementById("navbar");
+            const navbar_titleTheme = document.getElementById("navbar_title");
+            const partial_footerTheme = document.getElementById("partial_footer");
+            const nav_linkTheme = document.getElementsByClassName("nav-link2");
+            const navbar_gearTheme = document.getElementById("navbar_gear");
+            const table = document.getElementById("transactions-table");
+            console.log(table);
+            const table2 = document.getElementById("overview-table");
+            if (theme == "dark") {
+                navbar_gearTheme.setAttribute("fill", "#f5acc6");
+                if (table != null) {
+                    table.classList.add("dark-theme");
+                    table.classList.remove("light-theme");
+                    table2.classList.add("dark-theme");
+                    table2.classList.remove("light-theme");
+                }
+            }
+            else {
+                navbar_gearTheme.setAttribute("fill", "#392d31");
+                if (table != null) {
+                    table.classList.add("light-theme");
+                    table.classList.remove("dark-theme");
+                    table2.classList.add("light-theme");
+                    table2.classList.remove("dark-theme");
+                }
+            }
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+            navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
+            partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            for (let i = 0; i < nav_linkTheme.length; i++) {
+                nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            }
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
+
+
+
     for (let i = 0; i < document.getElementsByClassName('change').length; i++) {
         value = document.getElementsByClassName('change')[i].innerHTML;
-        value = parseFloat(value);
+        value = parseFloat(value).toFixed(4);
         if (value > 0) {
             document.getElementsByClassName('change')[i].classList.toggle("up");
             svg_up = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
@@ -559,6 +628,13 @@
         let foo2 = stuff.portfolioValues.slice(0, -1);
         const assetNames = Object.keys(stuff.assetAllocation);
         const assetPercentages = Object.values(stuff.assetAllocation);
+        const filteredIndices = assetPercentages
+            .map((percentage, index) => ({ percentage, index }))
+            .filter(item => item.percentage !== 0)
+            .map(item => item.index);
+        const filteredAssetNames = filteredIndices.map(index => assetNames[index]);
+        const filteredAssetPercentages = filteredIndices.map(index => assetPercentages[index]);
+
         const data = {
             labels: foo, // X AXIS
             datasets: [{
@@ -624,9 +700,9 @@
         new Chart(ctx2, {
             type: 'pie',
             data: {
-                labels: assetNames,
+                labels: filteredAssetNames,
                 datasets: [{
-                    data: assetPercentages,
+                    data: filteredAssetPercentages,
                     backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], // Customize colors
                 }]
             },
@@ -656,172 +732,68 @@
         });
     }
 
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-    //CONFIG STUFF ZA CHARTJS
-
-
-
-
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE        
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    //SAM DA SE SE KJE JE GOOD KJE PA NE
-    document.addEventListener("DOMContentLoaded", function () {
-        const savedThemeInput = document.getElementById("saved-theme");
-
-        // Apply the initial theme based on the value of the hidden input
-        const applyTheme = (theme) => {
-            const navbarTheme = document.getElementById("navbar");
-            const navbar_titleTheme = document.getElementById("navbar_title");
-            const partial_footerTheme = document.getElementById("partial_footer");
-            const nav_linkTheme = document.getElementsByClassName("nav-link2");
-            const navbar_gearTheme = document.getElementById("navbar_gear");
-            const table = document.getElementById("transactions-table");
-            const table2 = document.getElementById("overview-table");
-            if (theme == "dark") {
-                navbar_gearTheme.setAttribute("fill", "#f5acc6");
-                table.classList.add("dark-theme");
-                table.classList.remove("light-theme");
-                table2.classList.add("dark-theme");
-                table2.classList.remove("light-theme");
-            }
-            else {
-                navbar_gearTheme.setAttribute("fill", "#392d31");
-                table.classList.add("light-theme");
-                table.classList.remove("dark-theme");
-                table2.classList.add("light-theme");
-                table2.classList.remove("dark-theme");
-            }
-            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
-            navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
-            partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
-            navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
-            for (let i = 0; i < nav_linkTheme.length; i++) {
-                nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
-            }
-        };
-
-        // Initialize theme on page load
-        applyTheme(savedThemeInput.value);
-
-        // Observe changes to the input value
-        const observer = new MutationObserver(() => {
-            applyTheme(savedThemeInput.value);
-        });
-
-        // Start observing the hidden input for changes to the `value` attribute
-        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
-    });
-
     var spanElement = document.getElementById('trimmed');
     if (spanElement) {
         spanElement.textContent = spanElement.textContent.trim();
     }
+
+    function table_sort() {
+        const styleSheet = document.createElement('style');
+        styleSheet.innerHTML = `
+        .order-inactive span {
+            visibility:hidden;
+        }
+        .order-inactive:hover span {
+            visibility:visible;
+        }
+        .order-active span {
+            visibility: visible;
+        }
+    `;
+        document.head.appendChild(styleSheet);
+        console.log("test");
+        document.querySelectorAll('th.order').forEach(th_elem => {
+            let asc = true;
+            const span_elem = document.createElement('span');
+            span_elem.style = "font-size:0.8rem; margin-left:0.5rem";
+            span_elem.innerHTML = "▼";
+            th_elem.appendChild(span_elem);
+            th_elem.classList.add('order-inactive');
+
+            const index = Array.from(th_elem.parentNode.children).indexOf(th_elem);
+            th_elem.addEventListener('click', (e) => {
+                document.querySelectorAll('th.order').forEach(elem => {
+                    elem.classList.remove('order-active')
+                    elem.classList.add('order-inactive')
+                });
+                th_elem.classList.remove('order-inactive');
+                th_elem.classList.add('order-active');
+
+                if (!asc) {
+                    th_elem.querySelector('span').innerHTML = '▲';
+                } else {
+                    th_elem.querySelector('span').innerHTML = '▼';
+                }
+                const arr = Array.from(th_elem.closest("table").querySelectorAll('tbody tr'));
+                arr.sort((a, b) => {
+                    let a_val = a.children[index].innerText.replace(/[\$,]/g, '');
+                    let b_val = b.children[index].innerText.replace(/[\$,]/g, '');
+                    const a_num = parseFloat(a_val);
+                    const b_num = parseFloat(b_val);
+
+                    // Check if both values are valid numbers
+                    if (!isNaN(a_num) && !isNaN(b_num)) {
+                        return asc ? a_num - b_num : b_num - a_num;
+                    }
+                    return (asc) ? a_val.localeCompare(b_val) : b_val.localeCompare(a_val);
+                })
+                arr.forEach(elem => {
+                    th_elem.closest("table").querySelector("tbody").appendChild(elem)
+                });
+                asc = !asc;
+            })
+        })
+    }
+
+    table_sort();
 </script>

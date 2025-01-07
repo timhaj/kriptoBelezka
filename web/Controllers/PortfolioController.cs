@@ -10,6 +10,8 @@ using web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using EFCore.BulkExtensions;
+using System.Globalization;
 
 namespace web.Controllers
 {
@@ -51,8 +53,9 @@ namespace web.Controllers
                     TotalQuantity = g.Sum(t => t.Quantity), // Sum of quantities for this asset
                     AveragePrice = g.Average(t => t.Price), // Average price for this asset
                     CurrentAssetPrice = g.First().Asset.Price,
-                    ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price)) - 1
+                    ProfitLoss = (g.Sum(t => (decimal)t.Quantity) * (decimal)g.First().Asset.Price) / (g.Sum(t => (decimal)t.Quantity) * g.Average(t => (decimal)t.Price) + 0.01m) - 1
                 })
+                .Where(g => g.TotalQuantity > 0)
                 .ToList();
                 ViewBag.overview = transactionOverview;
                 //total portfolio networth
@@ -126,9 +129,71 @@ namespace web.Controllers
                 ViewBag.CurSymbol = "USD";
                 ViewBag.mode = "light";
             }
+            string apiUrl = "https://api.coincap.io/v2/assets?limit=2000";
+
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetStringAsync(apiUrl);
+                var apiResult = JsonConvert.DeserializeObject<ApiResponse>(response);
+
+                var newAssets = apiResult.Data.Select(asset => new Asset
+                {
+                    Name = asset.Name,
+                    Price = ParseDecimal(asset.PriceUsd, 0), // Default to 0 if parsing fails
+                    MarketCap = ParseDecimal(asset.MarketCapUsd, 0),
+                    CurrentSupply = ParseDecimal(asset.Supply, 0),
+                    MaxSupply = ParseDecimal(asset.MaxSupply, 0),
+                    ChangePercent24Hr = (float)ParseDecimal(asset.ChangePercent24Hr, 0)
+                }).ToList();
+
+                // Loči nove in obstoječe zapise
+                var existingAssets = _context.Assets.AsNoTracking().ToList();
+                var assetsToUpdate = existingAssets.Where(e => newAssets.Any(n => n.Name == e.Name)).ToList();
+                var assetsToAdd = newAssets.Where(n => !existingAssets.Any(e => e.Name == n.Name)).ToList();
+
+                // Posodobi obstoječe zapise
+                foreach (var existing in assetsToUpdate)
+                {
+                    var updated = newAssets.First(n => n.Name == existing.Name);
+                    existing.Price = updated.Price;
+                    existing.MarketCap = updated.MarketCap;
+                    existing.CurrentSupply = updated.CurrentSupply;
+                    existing.MaxSupply = updated.MaxSupply;
+                    existing.ChangePercent24Hr = updated.ChangePercent24Hr;
+                }
+
+                // Shrani vse spremembe
+                await _context.BulkUpdateAsync(assetsToUpdate);
+                await _context.BulkInsertAsync(assetsToAdd);
+            }
             return View(portfolios ?? new List<Portfolio>());
         }
 
+
+        decimal ParseDecimal(string input, decimal defaultValue)
+        {
+            return decimal.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
+                ? result
+                : defaultValue;
+        }
+
+        public class ApiResponse
+        {
+            public List<CryptoData> Data { get; set; }
+        }
+
+        public class CryptoData
+        {
+            public string Rank { get; set; }
+            public string Symbol { get; set; }
+            public string Name { get; set; }
+            public string PriceUsd { get; set; }
+            public string Supply { get; set; }
+            public string MaxSupply { get; set; }
+            public string MarketCapUsd { get; set; }
+            public string VolumeUsd24Hr { get; set; }
+            public string ChangePercent24Hr { get; set; }
+        }
 
 
         public class ApiResponse2
