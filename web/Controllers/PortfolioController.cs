@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using EFCore.BulkExtensions;
 using System.Globalization;
+using System.IO;
+using System.Text;
 
 namespace web.Controllers
 {
@@ -25,6 +27,33 @@ namespace web.Controllers
         {
             _context = context;
             _usermanager = userManager;
+        }
+
+        public IActionResult Export()
+        {
+            var transactions = _context.Transakcijas
+                .Include(t => t.Asset)
+                .ToList();
+            var csvString = GenerateCsv(transactions);
+            var bytes = Encoding.UTF8.GetBytes(csvString);
+            var result = new FileContentResult(bytes, "text/csv")
+            {
+                FileDownloadName = "transactions.csv"
+            };
+            return result;
+        }
+
+        private string GenerateCsv(IEnumerable<Transakcija> transactions)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("AssetName,Quantity,Date,Price,OrderType");
+            foreach (var t in transactions)
+            {
+                var assetName = t.Asset?.Name ?? "N/A";
+                var orderType = t.Quantity >= 0 ? "BUY" : "SELL";
+                sb.AppendLine($"{assetName},{t.Quantity.ToString(CultureInfo.InvariantCulture)},{t.Date.ToString("yyyy-MM-dd")},{t.Price.ToString(CultureInfo.InvariantCulture)},{orderType}");
+            }
+            return sb.ToString();
         }
 
         // GET: Portfolio

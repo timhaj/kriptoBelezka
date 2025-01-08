@@ -10,6 +10,7 @@ using web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Formats.Tar;
+using System.Globalization;
 
 namespace web.Controllers
 {
@@ -85,7 +86,6 @@ namespace web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PortfolioId,AssetId,Quantity,Date,Price")] Transakcija transakcija)
         {
-            Console.WriteLine(Request.Form["OrderType"]);
             string orderType = Request.Form["OrderType"].ToString();
             if (orderType == "Buy")
             {
@@ -99,7 +99,6 @@ namespace web.Controllers
             {
                 transakcija.Quantity = transakcija.Quantity;
             }
-            Console.WriteLine(transakcija.Quantity);
             if (ModelState.IsValid)
             {
                 _context.Add(transakcija);
