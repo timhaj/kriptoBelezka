@@ -177,6 +177,16 @@ namespace web.Controllers
             var currentUser = await _usermanager.GetUserAsync(User);
             if (currentUser != null)
             {
+                if (currentUser.Id == watchlist2.OwnerId.Id)
+                {
+                    ViewBag.IsOwner = true;
+                }
+                else
+                {
+                    ViewBag.IsOwner = false;
+                }
+
+
                 var nastavitve = await _context.Nastavitves
                                             .Where(s => s.OwnerId == currentUser)
                                             .FirstOrDefaultAsync();

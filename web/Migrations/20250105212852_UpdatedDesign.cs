@@ -16,7 +16,21 @@ namespace web.Migrations
                 type: "decimal(18,2)",
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "decimal(18,12)");
+                oldType: "decimal(30,12)");
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Price",
+                table: "Transakcija",
+                type: "decimal(18,2)",
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(30,12)");
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Quantity",
+                table: "Transakcija",
+                type: "decimal(18,2)",
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(30,12)");
         }
 
         /// <inheritdoc />
@@ -25,7 +39,21 @@ namespace web.Migrations
             migrationBuilder.AlterColumn<decimal>(
                 name: "Price",
                 table: "Asset",
-                type: "decimal(18,12)",
+                type: "decimal(30,12)",
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)");
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Price",
+                table: "Transakcija",
+                type: "decimal(30,12)",
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)");
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Quantity",
+                table: "Transakcija",
+                type: "decimal(30,12)",
                 nullable: false,
                 oldClrType: typeof(decimal),
                 oldType: "decimal(18,2)");
