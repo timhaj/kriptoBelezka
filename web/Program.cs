@@ -17,6 +17,10 @@ builder.Services.AddDbContext<BelezkaContext>(options =>
 
 // prilagodi RequireConfirmedAccount = false in .AddRoles<IdentityRole>()
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddRoles<IdentityRole>().AddEntityFrameworkStores<BelezkaContext>();
+
+builder.Services.AddSwaggerGen();
+
+
 var app = builder.Build();
 
 
@@ -30,6 +34,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1 API");
+});
+
 
 app.UseRouting();
 

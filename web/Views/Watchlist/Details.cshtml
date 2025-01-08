@@ -13,25 +13,33 @@
             < Back to List</a>
     </div>
     <hr />
-    <form asp-action="Create" asp-controller="WatchlistAsset" method="post"
-        class="d-flex flex-row justify-content-end align-items-center">
-        <div class="dropdown" id="watchlist_dropdown">
-            <div class="form-group">
-                <input type="text" class="search-bar" id="searchInput" placeholder="Search crypto tokens..."
-                    onkeyup="filterOptions()">
 
-                <div class="options-list" id="cryptoSelect" name="AssetId" required>
-                    @foreach (var asset in Model.Assets)
-                    {
-                        <div class="option" value="@asset.Id">@asset.Name</div>
-                    }
+    @{
+        if (ViewBag.IsOwner)
+        {
+            <form asp-action="Create" asp-controller="WatchlistAsset" method="post"
+                class="d-flex flex-row justify-content-end align-items-center">
+                <div class="dropdown" id="watchlist_dropdown">
+                    <div class="form-group">
+                        <input type="text" class="search-bar" id="searchInput" placeholder="Search crypto tokens..."
+                            onkeyup="filterOptions()">
+
+                        <div class="options-list" id="cryptoSelect" name="AssetId" required>
+                            @foreach (var asset in Model.Assets)
+                            {
+                                <div class="option" value="@asset.Id">@asset.Name</div>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
-        <input type="hidden" name="AssetId" value="" />
-        <button id="watchlist-asset-adder" class="btn" type="submit">Add asset</button>
-    </form>
+                <input type="hidden" name="WatchlistId" value="@Model.Watchlist.Id" />
+                <input type="hidden" name="AssetId" value="" />
+                <button id="watchlist-asset-adder" class="btn" type="submit">Add asset</button>
+            </form>
+        }
+    }
+
+
 </div>
 <br />
 <table class="table striped-table table-hover" id="watchlist-table">
