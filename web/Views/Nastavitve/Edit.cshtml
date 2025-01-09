@@ -19,6 +19,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" name="CurrentCurrencySelected"
                 value="@ViewBag.SavedCurrency.CurrentCurrencySelected" />
+            <input type="hidden" name="ApiKey" value="@ViewBag.ApiKey" />
             <input type="hidden" asp-for="Id" />
             @*             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -55,6 +56,18 @@
             <br />
             <br />
             <br />
+            <div>
+                API key
+                <div class="d-flex">
+                    <p id="settings_apikey" onclick="copyToClipboard()">@ViewBag.ApiKey</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        id="copy_to_clipboard_button" onclick="copyToClipboard()" class="bi bi-copy ms-2"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+                    </svg>
+                </div>
+            </div>
 
             <div class="form-group">
                 <input type="submit" id="nastavitve_save_button" value="Save" class="btn" />
@@ -145,4 +158,14 @@
     });
     var checkbox = document.getElementById("switcher_input");
     checkbox.checked = !checkbox.checked;
+
+    function copyToClipboard() {
+        var apiKeyElement = document.getElementById('settings_apikey');
+        var tempInput = document.createElement('input');
+        tempInput.value = apiKeyElement.textContent;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+    }
 </script>

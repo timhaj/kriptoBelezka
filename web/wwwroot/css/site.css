@@ -476,3 +476,15 @@ label+input {
   color: #282828;
   background-color: #f096b8;
 }
+
+#settings_apikey:hover {
+  color: #df4f90;
+  border-bottom: 1px solid #df4f90;
+  cursor: pointer;
+  width: fit-content;
+}
+
+#copy_to_clipboard_button:hover {
+  color: #df4f90;
+  cursor: pointer;
+}

@@ -13,7 +13,7 @@ namespace web.Controllers_Api
 {
     [Route("api/v1")]
     [ApiController]
-    [ApiKeyAuth]
+    /* [ApiKeyAuth] */
     public class PortfolioApiController : ControllerBase
     {
         private readonly BelezkaContext _context;
@@ -70,12 +70,20 @@ namespace web.Controllers_Api
 
         // GET: api/PortfolioApi/5
         [HttpGet("Transactions/{id}")]
-        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetPortfolio(int id)
+        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetPortfolio(string id)
         {
+            var userSettings = await _context.Nastavitves.Include(n => n.OwnerId)
+                .FirstOrDefaultAsync(n => n.ApiKey.Equals(id));
+            if (userSettings == null)
+            {
+                return NotFound("Invalid API key.");
+            }
+
+
             var portfolio = await _context.Portfolios
                 .Include(p => p.Transactions)
                 .ThenInclude(t => t.Asset)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.OwnerId.Id == userSettings.OwnerId.Id);
 
             if (portfolio == null)
             {
@@ -95,14 +103,21 @@ namespace web.Controllers_Api
             return Ok(transactions);
         }
 
-
         // GET: api/v1/Overview/{id}
         [HttpGet("Overview/{id}")]
-        public async Task<ActionResult<IEnumerable<AssetOverviewDto>>> GetPortfolioOverview(int id)
+        public async Task<ActionResult<IEnumerable<AssetOverviewDto>>> GetPortfolioOverview(string id)
         {
+            var userSettings = await _context.Nastavitves.Include(n => n.OwnerId)
+                .FirstOrDefaultAsync(n => n.ApiKey.Equals(id));
+            if (userSettings == null)
+            {
+                return NotFound("Invalid API key.");
+            }
+
             var transactions = await _context.Transakcijas
-                .Where(t => t.PortfolioId == id)
+                .Include(t => t.Portfolio)
                 .Include(t => t.Asset)
+                .Where(t => t.Portfolio.OwnerId.Id == userSettings.OwnerId.Id)
                 .OrderByDescending(t => t.Date)
                 .ToListAsync();
 
@@ -129,11 +144,18 @@ namespace web.Controllers_Api
         }
 
         [HttpGet("Networth/{id}")]
-        public async Task<ActionResult<decimal>> GetPortfolioValue(int id)
+        public async Task<ActionResult<decimal>> GetPortfolioValue(string id)
         {
+            var userSettings = await _context.Nastavitves.Include(n => n.OwnerId)
+                .FirstOrDefaultAsync(n => n.ApiKey.Equals(id));
+            if (userSettings == null)
+            {
+                return NotFound("Invalid API key.");
+            }
             var transactions = await _context.Transakcijas
-                .Where(t => t.PortfolioId == id)
+                .Include(t => t.Portfolio)
                 .Include(t => t.Asset)
+                .Where(t => t.Portfolio.OwnerId.Id == userSettings.OwnerId.Id)
                 .ToListAsync();
 
             if (!transactions.Any())
