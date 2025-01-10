@@ -225,7 +225,25 @@ body.dark-mode {
 #create_transaction_submit,
 #watchlist-asset-adder,
 .portfolio-add-button,
-#portfolio_create_button {
+#portfolio_create_button,
+#update-profile-button,
+#change-email-button,
+#password_update,
+#download_personal_data,
+#enable-authenticator,
+#reset-authenticator,
+#enable-authenticator,
+#disable_2fa,
+#reset_recovery_codes,
+#forget_this_browser,
+#reset_password_reset,
+#resend_email_confirmation,
+#login_with_recovery_codes,
+#login_with_2fa,
+#forgot_password_reset,
+#external_login_register,
+#set_password_button,
+#verify_enable_authentication {
   background-color: #df4f90;
   color: white;
 }
@@ -236,7 +254,25 @@ body.dark-mode {
 #create_transaction_submit:hover,
 #watchlist-asset-adder:hover,
 .portfolio-add-button:hover,
-#portfolio_create_button:hover {
+#portfolio_create_button:hover,
+#update-profile-button:hover,
+#change-email-button:hover,
+#password_update:hover,
+#download_personal_data:hover,
+#enable-authenticator:hover,
+#reset-authenticator:hover,
+#enable-authenticator:hover,
+#disable_2fa:hover,
+#reset_recovery_codes:hover,
+#forget_this_browser:hover,
+#reset_password_reset:hover,
+#resend_email_confirmation:hover,
+#login_with_recovery_codes:hover,
+#login_with_2fa:hover,
+#forgot_password_reset:hover,
+#external_login_register:hover,
+#set_password_button:hover,
+#verify_enable_authentication:hover {
   color: #3f3f3f;
   background-color: #e5699d;
 }
@@ -352,7 +388,17 @@ input:checked~.slider::before {
 #register-a-new-user,
 #create_transaction_back_to_portfolio,
 .details_link,
-#watchlist_back_to_list {
+#watchlist_back_to_list,
+.generate_recovery_codes,
+#reset_password_confirmation,
+#recovery-code-login,
+#reset_authenticator_codes_link,
+.enable_authenticator_provider,
+#disable_2fa_resetauth {
+  color: #e5699d;
+}
+
+#email-verification {
   color: #e5699d;
 }
 
@@ -487,4 +533,18 @@ label+input {
 #copy_to_clipboard_button:hover {
   color: #df4f90;
   cursor: pointer;
+}
+
+a.to-change {
+  color: black;
+}
+
+a.to-change.nav-link.active {
+  color: #3f3f3f;
+  background-color: #e5699d;
+}
+
+a.to-change:hover {
+  color: #3f3f3f;
+  background-color: #e5699d;
 }

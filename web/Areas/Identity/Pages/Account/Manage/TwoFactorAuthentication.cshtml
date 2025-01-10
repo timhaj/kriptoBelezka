@@ -1,0 +1,115 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Two-factor authentication (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<input type="hidden" id="saved-theme" value="light-mode" />
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+@{
+    var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+    @if (consentFeature?.CanTrack ?? true)
+    {
+        @if (Model.Is2faEnabled)
+        {
+            if (Model.RecoveryCodesLeft == 0)
+            {
+                <div class="alert alert-danger">
+                    <strong>You have no recovery codes left.</strong>
+                    <p>You must <a asp-page="./GenerateRecoveryCodes" class="generate_recovery_codes">generate a new set of recovery
+                            codes</a> before you can log in
+                        with a recovery code.</p>
+                </div>
+            }
+            else if (Model.RecoveryCodesLeft == 1)
+            {
+                <div class="alert alert-danger">
+                    <strong>You have 1 recovery code left.</strong>
+                    <p>You can <a asp-page="./GenerateRecoveryCodes" class="generate_recovery_codes">generate a new set of recovery
+                            codes</a>.</p>
+                </div>
+            }
+            else if (Model.RecoveryCodesLeft <= 3)
+            {
+                <div class="alert alert-warning">
+                    <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
+                    <p>You should <a asp-page="./GenerateRecoveryCodes" class="generate_recovery_codes">generate a new set of recovery
+                            codes</a>.</p>
+                </div>
+            }
+
+            if (Model.IsMachineRemembered)
+            {
+                <form method="post" style="display: inline-block">
+                    <button type="submit" class="btn" id="forget_this_browser">Forget this browser</button>
+                </form>
+            }
+            <a asp-page="./Disable2fa" class="btn" id="disable_2fa">Disable 2FA</a>
+            <a asp-page="./GenerateRecoveryCodes" class="btn" id="reset_recovery_codes">Reset recovery codes</a>
+        }
+
+        <h4>Authenticator app</h4>
+        @if (!Model.HasAuthenticator)
+        {
+            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn">Add authenticator app</a>
+        }
+        else
+        {
+            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn">Set up authenticator app</a>
+            <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn">Reset authenticator app</a>
+        }
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <strong>Privacy and cookie policy have not been accepted.</strong>
+            <p>You must accept the policy before you can enable two factor authentication.</p>
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            const navbarTheme = document.getElementById("navbar");
+            const navbar_titleTheme = document.getElementById("navbar_title");
+            const partial_footerTheme = document.getElementById("partial_footer");
+            const nav_linkTheme = document.getElementsByClassName("nav-link2");
+            const navbar_gearTheme = document.getElementById("navbar_gear");
+            if (theme == "dark") {
+                navbar_gearTheme.setAttribute("fill", "#f5acc6");
+            }
+            else {
+                navbar_gearTheme.setAttribute("fill", "#392d31");
+            }
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+            navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
+            partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            for (let i = 0; i < nav_linkTheme.length; i++) {
+                nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            }
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
+</script>
