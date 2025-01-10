@@ -1,0 +1,74 @@
+﻿@page
+@model DeletePersonalDataModel
+@{
+    ViewData["Title"] = "Delete Personal Data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<input type="hidden" id="saved-theme" value="light-mode" />
+<h3>@ViewData["Title"]</h3>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+    </p>
+</div>
+
+<div>
+    <form id="delete-user" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        @if (Model.RequirePassword)
+        {
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true"
+                    placeholder="Please enter your password." />
+                <label asp-for="Input.Password" class="form-label"></label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+        }
+        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close my account</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedThemeInput = document.getElementById("saved-theme");
+
+        // Apply the initial theme based on the value of the hidden input
+        const applyTheme = (theme) => {
+            const navbarTheme = document.getElementById("navbar");
+            const navbar_titleTheme = document.getElementById("navbar_title");
+            const partial_footerTheme = document.getElementById("partial_footer");
+            const nav_linkTheme = document.getElementsByClassName("nav-link2");
+            const navbar_gearTheme = document.getElementById("navbar_gear");
+            if (theme == "dark") {
+                navbar_gearTheme.setAttribute("fill", "#f5acc6");
+            }
+            else {
+                navbar_gearTheme.setAttribute("fill", "#392d31");
+            }
+            document.body.className = theme === "dark" ? "dark-mode" : "light-mode";
+            navbarTheme.className = theme === "dark" ? "dark-mode" : "light-mode";
+            partial_footerTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            navbar_titleTheme.classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            for (let i = 0; i < nav_linkTheme.length; i++) {
+                nav_linkTheme[i].classList.toggle(theme === "dark" ? "dark-mode" : "light-mode");
+            }
+        };
+
+        // Initialize theme on page load
+        applyTheme(savedThemeInput.value);
+
+        // Observe changes to the input value
+        const observer = new MutationObserver(() => {
+            applyTheme(savedThemeInput.value);
+        });
+
+        // Start observing the hidden input for changes to the `value` attribute
+        observer.observe(savedThemeInput, { attributes: true, attributeFilter: ["value"] });
+    });
+</script>

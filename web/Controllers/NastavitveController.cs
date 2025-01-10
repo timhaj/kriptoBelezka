@@ -14,6 +14,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
 
 namespace web.Controllers
 {
@@ -83,6 +84,21 @@ namespace web.Controllers
             return View(nastavitve);
         }
 
+        private string GenerateApiKey()
+        {
+            string apiKey;
+            do
+            {
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    var byteArray = new byte[32];
+                    rng.GetBytes(byteArray);
+                    apiKey = Convert.ToBase64String(byteArray);
+                }
+            } while (_context.Nastavitves.Any(n => n.ApiKey == apiKey));
+            return apiKey;
+        }
+
         // GET: Nastavitve/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -100,17 +116,21 @@ namespace web.Controllers
                 {
                     OwnerId = currentUser, // Assign the current user's ID
                     IsDarkMode = false,       // Default value
-                    CurrentCurrencySelected = "united-states-dollar" // Default value
+                    CurrentCurrencySelected = "united-states-dollar", // Default value
+                    ApiKey = GenerateApiKey()
                 };
-
+                Console.WriteLine(nastavitve.ApiKey);
                 _context.Nastavitves.Add(nastavitve);
                 await _context.SaveChangesAsync();
                 ViewBag.SavedCurrency = nastavitve;
+                ViewBag.ApiKey = nastavitve.ApiKey;
             }
             else
             {
                 ViewBag.SavedCurrency = nastavitve;
+                ViewBag.ApiKey = nastavitve.ApiKey;
             }
+
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", nastavitve.UserId);
             if (currentUser != null)
             {
@@ -166,7 +186,7 @@ namespace web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,IsDarkMode,CurrentCurrencySelected")] Nastavitve nastavitve)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,IsDarkMode,CurrentCurrencySelected,ApiKey")] Nastavitve nastavitve)
         {
             nastavitve.IsDarkMode = !nastavitve.IsDarkMode;
             if (id != nastavitve.Id)
